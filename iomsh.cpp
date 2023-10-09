@@ -37,3 +37,30 @@ int& GmshHeader::DataSize()
 }
 
 
+//GmshPhysicalRegion 
+
+GmshPhysicalRegion::GmshPhysicalRegion(){}
+GmshPhysicalRegion::~GmshPhysicalRegion(){}
+
+
+int& GmshPhysicalRegion::Dimension()
+{
+    return dimension;
+}
+
+int& GmshPhysicalRegion::PhysicalTag()
+{
+    return physicalTag;
+}
+
+string& GmshPhysicalRegion::Name()
+{
+    return name;
+}
+
+
+
+// GmshNode
+
+GmshNode::GmshNode(){}
+GmshNode::~GmshNode(){}

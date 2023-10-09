@@ -21,34 +21,38 @@ private:
     int dataSize;
 };
 
-GmshHeader::GmshHeader(double ver, int ft, int ds)
+
+class GmshPhysicalRegion
 {
-    version        = ver;
-    this->fileType = ft;
-    this->dataSize = ds;
-}
+public:
+    GmshPhysicalRegion::GmshPhysicalRegion();
+    GmshPhysicalRegion::~GmshPhysicalRegion();
 
-GmshHeader::GmshHeader()
-{   version        = 0.0;
-    this->fileType = 0;
-    this->dataSize = 0;
-}
+    int& Dimension();
+    int& PhysicalTag();
+    string& Name();
 
-GmshHeader::~GmshHeader(){}
+private:
+    int dimension;
+    int physicalTag;
+    string name;
+};
 
-double& GmshHeader::Version()
+
+class GmshNode
 {
-    return version;
-}
+public:
+GmshNode::GmshNode();
+GmshNode::~GmshNode();
 
-int& GmshHeader::FileType()
-{
-    return fileType;
-}
+int& ID();
+double& X();
+double& Y();
+double& Z();
 
-int& GmshHeader::DataSize()
-{
-    return dataSize;
-}
-
-
+private:
+    int id;
+    double x;
+    double y;
+    double z;
+};

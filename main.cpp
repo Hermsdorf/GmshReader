@@ -27,7 +27,16 @@ int main()
 
     file>>h1.Version()>>h1.FileType()>>h1.DataSize();
 
-cout << h1.Version()<<" "<<h1.FileType()<<" "<<h1.DataSize()<<endl;
+    cout << h1.Version()<<" "<<h1.FileType()<<" "<<h1.DataSize()<<endl;
+    getline(file, line);//$EndMeshFormat
+
+    getline(file, line);
+    if(line != "$PhysicalNames")
+    {
+        cout << "Invalid file format" << endl;
+        return 0;
+    }
+    
 
     return 0;
 }
