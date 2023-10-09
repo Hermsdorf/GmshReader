@@ -64,3 +64,24 @@ string& GmshPhysicalRegion::Name()
 
 GmshNode::GmshNode(){}
 GmshNode::~GmshNode(){}
+
+double& GmshNode::X()
+{
+    return x;
+}
+
+double& GmshNode::Y()
+{
+    return y;
+}
+
+double& GmshNode::Z()
+{
+    return z;
+}
+
+
+//GmshElement
+
+GmshElement::GmshElement(){}
+GmshElement::~GmshElement(){}

@@ -1,5 +1,8 @@
 #include <iostream>
+#include <fstream>
 #include <string>
+#include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -55,4 +58,23 @@ private:
     double x;
     double y;
     double z;
+};
+
+
+class GmshElement
+{
+public:
+    GmshElement::GmshElement();
+    GmshElement::~GmshElement();
+
+    int& ID();
+    int& Type();
+    int& NumTags();
+
+private:
+    int id;
+    int type;
+    int numTags;
+    vector<int> tags;
+    vector<int> nodes;
 };
