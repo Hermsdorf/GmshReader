@@ -9,6 +9,8 @@
 int main()
 {
     string line;
+
+    /*
     ifstream file("malha.msh");
     if(!file.is_open())
     {
@@ -45,10 +47,10 @@ int main()
     {
         file >> m1.PhyReg[i].Dimension()>>m1.PhyReg[i].PhysicalTag()>>m1.PhyReg[i].Name();
         getline(file, line);
-        cout << m1.PhyReg[i].Dimension()<<" "<<m1.PhyReg[i].PhysicalTag()<<" "<<m1.PhyReg[i].Name()<<endl;;
+        //cout << m1.PhyReg[i].Dimension()<<" "<<m1.PhyReg[i].PhysicalTag()<<" "<<m1.PhyReg[i].Name()<<endl;;
     }
 
-    
+    */
 
     return 0;
 }

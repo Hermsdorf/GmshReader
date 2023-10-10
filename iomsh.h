@@ -28,8 +28,8 @@ private:
 class GmshPhysicalRegion
 {
 public:
-    GmshPhysicalRegion::GmshPhysicalRegion();
-    GmshPhysicalRegion::~GmshPhysicalRegion();
+    GmshPhysicalRegion();
+    ~GmshPhysicalRegion();
 
     int& Dimension();
     int& PhysicalTag();
@@ -45,8 +45,8 @@ private:
 class GmshNode
 {
 public:
-GmshNode::GmshNode();
-GmshNode::~GmshNode();
+GmshNode();
+~GmshNode();
 
 int& ID();
 double& X();
@@ -64,8 +64,8 @@ private:
 class GmshElement
 {
 public:
-    GmshElement::GmshElement();
-    GmshElement::~GmshElement();
+    GmshElement();
+    ~GmshElement();
 
     int& ID();
     int& Type();
@@ -82,26 +82,23 @@ private:
 class Mesh
 {
     public:
-    Mesh::Mesh();
-    Mesh::~Mesh();
+    Mesh();
+    ~Mesh();
 
     int& NumberNodes();
     int& NumberElements();
     int& NumPhyRegions();
+
+
+
+
+    private:
 
     GmshHeader FileHeader;
     GmshPhysicalRegion *PhyReg ; 
     GmshNode *nodes;
     GmshElement *elements;
 
-    /*
-    GmshHeader FileHeader;
-    GmshPhysicalRegion *PhyReg = new GmshPhysicalRegion[nphyreg]; 
-    GmshNode *nodes = new GmshNode[nnodes];
-    GmshElement *elements = new GmshElement[nelements];
-    */
-
-    private:
     int nnodes;
     int nelements;
     int nphyreg;

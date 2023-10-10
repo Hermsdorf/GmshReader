@@ -58,10 +58,7 @@ string& GmshPhysicalRegion::Name()
     return name;
 }
 
-//Mesh
 
-Mesh::Mesh(){}
-Mesh::~Mesh(){}
 
 // GmshNode
 
