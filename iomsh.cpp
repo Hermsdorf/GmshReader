@@ -58,7 +58,10 @@ string& GmshPhysicalRegion::Name()
     return name;
 }
 
+//Mesh
 
+Mesh::Mesh(){}
+Mesh::~Mesh(){}
 
 // GmshNode
 
@@ -85,3 +88,26 @@ double& GmshNode::Z()
 
 GmshElement::GmshElement(){}
 GmshElement::~GmshElement(){}
+
+
+Mesh::Mesh()
+{}
+Mesh::~Mesh(){}
+
+
+int& Mesh::NumberNodes()
+{
+    return nnodes;
+}
+
+
+int& Mesh::NumberElements()
+{
+    return nelements;
+}
+
+
+int& Mesh::NumPhyRegions()
+{
+    return nphyreg;
+}

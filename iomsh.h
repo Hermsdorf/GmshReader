@@ -78,3 +78,31 @@ private:
     vector<int> tags;
     vector<int> nodes;
 };
+
+class Mesh
+{
+    public:
+    Mesh::Mesh();
+    Mesh::~Mesh();
+
+    int& NumberNodes();
+    int& NumberElements();
+    int& NumPhyRegions();
+
+    GmshHeader FileHeader;
+    GmshPhysicalRegion *PhyReg ; 
+    GmshNode *nodes;
+    GmshElement *elements;
+
+    /*
+    GmshHeader FileHeader;
+    GmshPhysicalRegion *PhyReg = new GmshPhysicalRegion[nphyreg]; 
+    GmshNode *nodes = new GmshNode[nnodes];
+    GmshElement *elements = new GmshElement[nelements];
+    */
+
+    private:
+    int nnodes;
+    int nelements;
+    int nphyreg;
+};

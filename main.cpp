@@ -23,11 +23,11 @@ int main()
         return 0;
     }
 
-    GmshHeader h1;
+    Mesh m1;
 
-    file>>h1.Version()>>h1.FileType()>>h1.DataSize();
+    file>>m1.FileHeader.Version()>>m1.FileHeader.FileType()>>m1.FileHeader.DataSize();
 
-    cout << h1.Version()<<" "<<h1.FileType()<<" "<<h1.DataSize()<<endl;
+    cout << m1.FileHeader.Version()<<" "<<m1.FileHeader.FileType()<<" "<<m1.FileHeader.DataSize();
     getline(file, line);//$EndMeshFormat
 
     getline(file, line);
@@ -36,6 +36,18 @@ int main()
         cout << "Invalid file format" << endl;
         return 0;
     }
+
+    file >>m1.NumPhyRegions();
+    m1.PhyReg = new GmshPhysicalRegion[m1.NumPhyRegions()];
+    getline(file, line);
+
+    for(int i=0; i<m1.NumPhyRegions(); i++)
+    {
+        file >> m1.PhyReg[i].Dimension()>>m1.PhyReg[i].PhysicalTag()>>m1.PhyReg[i].Name();
+        getline(file, line);
+        cout << m1.PhyReg[i].Dimension()<<" "<<m1.PhyReg[i].PhysicalTag()<<" "<<m1.PhyReg[i].Name()<<endl;;
+    }
+
     
 
     return 0;
