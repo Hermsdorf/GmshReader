@@ -6,6 +6,7 @@
 
 using namespace std;
 
+
 class GmshHeader
 {
 public:
@@ -70,6 +71,8 @@ public:
     int& ID();
     int& Type();
     int& NumTags();
+    vector<int>& Tags();
+    vector<int>& Nodes();
 
 private:
     int id;
@@ -85,20 +88,25 @@ class Mesh
     Mesh();
     ~Mesh();
 
+    void OpenFile(string FileName);
+
+    int& NumPhyRegions();
     int& NumberNodes();
     int& NumberElements();
-    int& NumPhyRegions();
 
-
-
+    GmshHeader& FileHeader();
+    GmshPhysicalRegion* PhyReg();
+    GmshNode* Nodes();
+    GmshElement* Elements();
 
     private:
 
-    GmshHeader FileHeader;
-    GmshPhysicalRegion *PhyReg ; 
+    GmshHeader fileHeader;
+    GmshPhysicalRegion *phyReg ; 
     GmshNode *nodes;
     GmshElement *elements;
-
+    
+    int ElementType[11] = {0,2,3,4,4,8,6,5,3,6,9};
     int nnodes;
     int nelements;
     int nphyreg;

@@ -58,13 +58,17 @@ string& GmshPhysicalRegion::Name()
     return name;
 }
 
-// teste
 
 
 // GmshNode
 
 GmshNode::GmshNode(){}
 GmshNode::~GmshNode(){}
+
+int& GmshNode::ID()
+{
+    return id;
+}
 
 double& GmshNode::X()
 {
@@ -87,10 +91,125 @@ double& GmshNode::Z()
 GmshElement::GmshElement(){}
 GmshElement::~GmshElement(){}
 
+int& GmshElement::ID()
+    {
+        return id;
+    }
+
+int& GmshElement::Type()
+    {
+        return type;
+    }
+
+int& GmshElement::NumTags()
+    {
+        return numTags;
+        ;
+    }
+
+vector<int>& GmshElement::Tags()
+{
+    return tags;
+}
+
+vector<int>& GmshElement::Nodes()
+{
+    return nodes;
+}
+
+
+//Mesh
 
 Mesh::Mesh()
 {}
 Mesh::~Mesh(){}
+
+void Mesh::OpenFile(string FileName)
+{
+    string line;
+    ifstream file;
+    
+
+    file.open(FileName, ios::in);
+    if(!file.is_open())
+    {
+        cout << "Unable to open file" << endl;
+        //return 0;
+    }
+
+    getline(file,line); //$MeshFormat
+    if(line != "$MeshFormat")
+    {
+        cout << "Invalid file format" << endl;
+        //return 0;
+    }
+
+    file >> FileHeader().Version()
+         >> FileHeader().FileType()
+         >> FileHeader().DataSize();
+    getline(file,line);
+    getline(file,line); //$EndMeshFormat
+    
+
+    getline(file,line); //$PhysicalNames
+    file >> NumPhyRegions(); getline(file,line); 
+    phyReg = new GmshPhysicalRegion [NumPhyRegions()];
+
+    for(int i = 0; i < NumPhyRegions(); i++)
+    {
+        file >> phyReg[i].Dimension() 
+             >> phyReg[i].PhysicalTag()
+             >> phyReg[i].Name();
+        getline(file, line);
+    }
+    getline(file,line); // $EndPhysicalNames
+
+    /*---------------Nodes---------------*/
+
+    getline(file,line); // $Nodes
+    file >> NumberNodes(); getline(file,line); 
+    nodes = new GmshNode[NumberNodes()];
+
+    for(int i=0; i< NumberNodes(); i++)
+    {
+        file >> nodes[i].ID()
+             >> nodes[i].X()
+             >> nodes[i].Y()
+             >> nodes[i].Z();
+        getline(file,line);
+    }
+    getline(file,line); // $EndNodes;
+
+    /*-----------Elements-----------*/
+
+    getline(file,line); // $Elements;
+    file >> NumberElements(); getline(file,line);
+    elements = new GmshElement[NumberElements()];
+
+    for(int i=0; i<NumberElements(); i++)
+    {
+        file >> elements[i].ID()
+             >> elements[i].Type()
+             >> elements[i].NumTags();
+        elements[i].Tags().resize(elements[i].NumTags());
+        for(int j=0; j< elements[i].NumTags(); j++)
+        {
+            file >> elements[i].Tags()[j];
+        }
+
+        elements[i].Nodes().resize(ElementType[elements[i].Type()]);
+        for(int k=0; k<ElementType[elements[i].Type()]; k++)
+        {
+            file >> elements[i].Nodes()[k];
+        }
+        getline(file,line);
+    }
+
+    
+
+    file.close();
+
+}
 
 
 int& Mesh::NumberNodes()
@@ -108,4 +227,27 @@ int& Mesh::NumberElements()
 int& Mesh::NumPhyRegions()
 {
     return nphyreg;
+}
+
+GmshHeader& Mesh::FileHeader()
+{
+    return fileHeader;
+}
+
+GmshPhysicalRegion* Mesh::PhyReg()
+{
+    return phyReg;
+}
+
+
+GmshNode* Mesh::Nodes()
+{
+    return nodes;
+}
+
+
+
+GmshElement* Mesh::Elements()
+{
+    return elements;
 }
