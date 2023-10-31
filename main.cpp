@@ -8,6 +8,7 @@
 
 int main()
 {
+    string file;
     Mesh m;
     m.OpenFile("malha.msh");
 
@@ -61,6 +62,22 @@ int main()
         }
         cout << endl<< endl;
 
+    }
+
+    int option;
+    cout << "Exportar malha?" << endl
+         << "1 - S" << endl
+         << "2 - N" << endl;
+    
+    cin >> option;
+    if(option == 1)
+    {
+        cout << "Digite o nome do arquivo: ";
+        cin >> file;
+        file = file + ".msh";
+        cout << "Exportando malha....."<<endl;
+        m.ExportFile(file);
+        cout << "Malha exportada em "<< file << endl;
     }
 
 

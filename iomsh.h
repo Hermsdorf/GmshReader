@@ -89,6 +89,7 @@ class Mesh
     ~Mesh();
 
     void OpenFile(string FileName);
+    void ExportFile(string FileName);
 
     int& NumPhyRegions();
     int& NumberNodes();

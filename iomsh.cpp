@@ -211,6 +211,83 @@ void Mesh::OpenFile(string FileName)
 
 }
 
+void Mesh::ExportFile(string FileName)
+{
+    string line;
+    ofstream file; 
+
+    file.open(FileName, ios::out);
+    if(!file.is_open())
+    {
+        cout << "Unable to open file" << endl;
+        //return 0;
+    }
+
+
+/*---------------Mesh Format---------------*/
+
+    file << "$MeshFormat" << '\n';
+    file << FileHeader().Version() << " "
+         << FileHeader().FileType() <<" "
+         << FileHeader().DataSize() << '\n'
+         << "$EndMeshFormat" << '\n'; 
+
+
+/*---------------Physical Regions---------------*/
+    
+    file << "$PhysicalNames" << '\n';
+    file << NumPhyRegions() << '\n';
+
+     for(int i = 0; i < NumPhyRegions(); i++)
+    {
+        file << phyReg[i].Dimension() << " " 
+             << phyReg[i].PhysicalTag()<< " "
+             << phyReg[i].Name() <<'\n';
+    }
+    file << "$EndPhysicalNames" << '\n';
+
+
+/*---------------Nodes---------------*/
+
+    file << "$Nodes" << '\n';
+    file << NumberNodes()<<'\n';
+
+    for(int i=0; i< NumberNodes(); i++)
+    {
+        file << nodes[i].ID() << " "
+             << nodes[i].X() << " "
+             << nodes[i].Y() << " "
+             << nodes[i].Z() << '\n';
+    }
+    file << "$EndNodes" << '\n';
+
+
+/*--------------Elements--------------*/
+
+    file << "$Elements" << '\n';
+    file << NumberElements() << '\n';
+
+    for(int i=0; i<NumberElements(); i++)
+    {
+        file << elements[i].ID() << " "
+             << elements[i].Type() << " "
+             << elements[i].NumTags() << " ";
+        elements[i].Tags().resize(elements[i].NumTags());
+        for(int j=0; j< elements[i].NumTags(); j++)
+        {
+            file << elements[i].Tags()[j]<< " ";
+        }
+
+        elements[i].Nodes().resize(ElementType[elements[i].Type()]);
+        for(int k=0; k<ElementType[elements[i].Type()]; k++)
+        {
+            file << elements[i].Nodes()[k]<< " ";
+        }
+        file << '\n';
+    }
+    file << "$EndElements";
+    file.close();
+}
 
 int& Mesh::NumberNodes()
 {
