@@ -6,8 +6,22 @@
 
 #include "iomsh.h"
 
+//retorna o indice do vetor nodes do elemento
+
+static int Tri3Edge[3][2] = { 
+                                {0,1},{1,2},{2,0}
+                             };
+
+
+static int Quad4Edge[4][2] = {{0,1},
+                              {1,2},
+                              {2,3},
+                              {3,0}
+                              };
+
 GmshHeader::GmshHeader(double ver, int ft, int ds)
 {
+
     version        = ver;
     this->fileType = ft;
     this->dataSize = ds;
@@ -128,6 +142,7 @@ void Mesh::OpenFile(string FileName)
 {
     string line;
     ifstream file;
+    this->dimension = 0;
     
 
     file.open(FileName, ios::in);
@@ -161,6 +176,7 @@ void Mesh::OpenFile(string FileName)
              >> phyReg[i].PhysicalTag()
              >> phyReg[i].Name();
         getline(file, line);
+        this->dimension = std::max(this->dimension,phyReg[i].Dimension());// pega a dimensão da malha
     }
     getline(file,line); // $EndPhysicalNames
 
@@ -294,12 +310,10 @@ int& Mesh::NumberNodes()
     return nnodes;
 }
 
-
 int& Mesh::NumberElements()
 {
     return nelements;
 }
-
 
 int& Mesh::NumPhyRegions()
 {
@@ -316,15 +330,67 @@ GmshPhysicalRegion* Mesh::PhyReg()
     return phyReg;
 }
 
-
 GmshNode* Mesh::Nodes()
 {
     return nodes;
 }
 
-
-
 GmshElement* Mesh::Elements()
 {
     return elements;
+}
+
+void Mesh::getEdges()
+{
+    unsigned int nedges = 0;
+    for(int i=0; i<this->nelements; i++)
+    {
+        if(this->elements[i].Type() == 2)
+        {
+            cout << "Element " << elements[i].ID() << endl;
+            for(int j=0; j<3; j++)
+            {
+                int nl1 = Tri3Edge[j][0];
+                int nl2 = Tri3Edge[j][1];
+
+                int ng1 = elements[i].Nodes()[nl1];
+                int ng2 = elements[i].Nodes()[nl2];
+
+                cout << "   Arestas " << j <<": " << ng1 << " -- " << ng2 << endl;
+
+
+            }
+        }
+            if(this->elements[i].Type() == 3)
+            {
+            cout << "Element " << elements[i].ID() << endl;
+            for(int j=0; j<4; j++)
+            {
+                int nl1 = Quad4Edge[j][0]; 
+                int nl2 = Quad4Edge[j][1];
+                
+
+                //int ng1 = elements[i].Nodes()[nl1];
+                //int ng2 = elements[i].Nodes()[nl2];
+                //pairing (ng1, ng2)  edge id ---> hash key?
+                Edge e(elements[i].Nodes()[nl1],elements[i].Nodes()[nl2]);
+                unsigned long key = prg::pairing(e.v1, e.v2);
+                if(EdgeMap.find(key) == EdgeMap.end())
+                {
+                    e.id = nedges++;
+                    EdgeMap[key] = e;
+                }
+
+
+                // gerar hash de ng1 ng2
+                // verificar se aresta ja esta na tabela
+                // Se nao, inserir edge na tabela
+
+                cout << "   Aresta " << j <<": " << elements[i].Nodes()[nl1]<< " -- " << elements[i].Nodes()[nl2] << endl;
+
+
+            }
+        }
+        
+    }
 }
