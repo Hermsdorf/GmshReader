@@ -8,14 +8,13 @@
 using namespace std;
 
 
-
-
 class Edge
-{// sobrecarga de operadores (igualdade)
+{
     public:
-    Edge(unsigned int vert1, unsigned int vert2): v1(vert1), v2(vert2){};
-       unsigned int id;
-       unsigned int v1, v2;
+    Edge(unsigned int vert1, unsigned int vert2);
+    ~Edge();
+    unsigned int id;
+    unsigned int v1, v2;
 
 
 };
@@ -113,10 +112,10 @@ class Mesh
     GmshPhysicalRegion* PhyReg();
     GmshNode* Nodes();
     GmshElement* Elements();
+    std::unordered_map<unsigned long int , Edge > EdgeMap;
 
     private:
     
-    std::unordered_map<unsigned long int , Edge > EdgeMap;
     GmshHeader fileHeader;
     GmshPhysicalRegion *phyReg ; 
     GmshNode *nodes;

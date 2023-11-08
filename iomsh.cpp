@@ -353,8 +353,8 @@ void Mesh::getEdges()
                 int nl1 = Tri3Edge[j][0];
                 int nl2 = Tri3Edge[j][1];
 
-                int ng1 = elements[i].Nodes()[nl1];
-                int ng2 = elements[i].Nodes()[nl2];
+                unsigned int ng1 = elements[i].Nodes()[nl1];
+                unsigned int ng2 = elements[i].Nodes()[nl2];
 
                 cout << "   Arestas " << j <<": " << ng1 << " -- " << ng2 << endl;
 
@@ -370,10 +370,10 @@ void Mesh::getEdges()
                 int nl2 = Quad4Edge[j][1];
                 
 
-                //int ng1 = elements[i].Nodes()[nl1];
-                //int ng2 = elements[i].Nodes()[nl2];
+                unsigned int ng1 = elements[i].Nodes()[nl1];
+                unsigned int ng2 = elements[i].Nodes()[nl2];
                 //pairing (ng1, ng2)  edge id ---> hash key?
-                Edge e(elements[i].Nodes()[nl1],elements[i].Nodes()[nl2]);
+                Edge e(ng1,ng2);
                 unsigned long key = prg::pairing(e.v1, e.v2);
                 if(EdgeMap.find(key) == EdgeMap.end())
                 {
@@ -394,3 +394,11 @@ void Mesh::getEdges()
         
     }
 }
+
+Edge::Edge(unsigned int vert1, unsigned int vert2)
+{
+    v1 = vert1;
+    v2 = vert2;
+}
+
+Edge::~Edge(){}
