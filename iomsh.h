@@ -4,14 +4,41 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
+#include <math.h>
 
 using namespace std;
+
+
+
+unsigned long CantorKey(unsigned int x, unsigned int y)
+{
+    if(x>y)
+        return (((x+y+1)*(x+y))/2)+x;
+    else
+        return (((x+y+1)*(x+y))/2)+y;
+}
+    
+unsigned long ElegantKey(unsigned int x, unsigned int y)
+{
+
+    if(x<y)
+    {
+        return (pow(y,2) + x);
+    }
+    else
+    {   
+        return (pow(x,2) + y);
+    }
+
+}
+
 
 
 class Edge
 {
     public:
     Edge(unsigned int vert1, unsigned int vert2);
+    Edge();
     ~Edge();
     unsigned int id;
     unsigned int v1, v2;
@@ -129,16 +156,7 @@ class Mesh
     int dimension;
 };
 
-namespace prg 
-{
-    unsigned long pairing(unsigned int x, unsigned int y)
-    {
-        return (((x+y+1)*(x+y))/2)+y;
-    }
 
-    void unpairing(unsigned long key)
-    {
 
-    }
 
-}
+

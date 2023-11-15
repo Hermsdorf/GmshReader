@@ -8,6 +8,8 @@
 
 //retorna o indice do vetor nodes do elemento
 
+
+
 static int Tri3Edge[3][2] = { 
                                 {0,1},{1,2},{2,0}
                              };
@@ -361,8 +363,8 @@ void Mesh::getEdges()
 
             }
         }
-            if(this->elements[i].Type() == 3)
-            {
+        if(this->elements[i].Type() == 3)
+        {
             cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<4; j++)
             {
@@ -372,27 +374,28 @@ void Mesh::getEdges()
 
                 unsigned int ng1 = elements[i].Nodes()[nl1];
                 unsigned int ng2 = elements[i].Nodes()[nl2];
-                //pairing (ng1, ng2)  edge id ---> hash key?
+                
                 Edge e(ng1,ng2);
-                unsigned long key = prg::pairing(e.v1, e.v2);
+                unsigned long key = CantorKey(e.v1, e.v2);
                 if(EdgeMap.find(key) == EdgeMap.end())
                 {
+                    //
                     e.id = nedges++;
                     EdgeMap[key] = e;
                 }
 
 
-                // gerar hash de ng1 ng2
-                // verificar se aresta ja esta na tabela
-                // Se nao, inserir edge na tabela
-
-                cout << "   Aresta " << j <<": " << elements[i].Nodes()[nl1]<< " -- " << elements[i].Nodes()[nl2] << endl;
+                cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
 
 
             }
+            
         }
+
         
     }
+        cout << "Quantidade de Arestas: "<< nedges<<endl;
+       
 }
 
 Edge::Edge(unsigned int vert1, unsigned int vert2)
@@ -400,5 +403,7 @@ Edge::Edge(unsigned int vert1, unsigned int vert2)
     v1 = vert1;
     v2 = vert2;
 }
+
+Edge::Edge(){}
 
 Edge::~Edge(){}

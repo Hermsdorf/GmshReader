@@ -66,7 +66,9 @@ int main()
 
     m.getEdges();
 
-    int option;
+    /*
+    
+        int option;
     cout << "Exportar malha?" << endl
          << "1 - S" << endl
          << "2 - N" << endl;
@@ -81,6 +83,8 @@ int main()
         m.ExportFile(file);
         cout << "Malha exportada em "<< file << endl;
     }
+    */
+
 
 
     return 0;
