@@ -5,21 +5,9 @@
 #include <vector>
 
 #include "iomsh.h"
+#include "operadores.h"
 
-//retorna o indice do vetor nodes do elemento
-
-
-
-static int Tri3Edge[3][2] = { 
-                                {0,1},{1,2},{2,0}
-                             };
-
-
-static int Quad4Edge[4][2] = {{0,1},
-                              {1,2},
-                              {2,3},
-                              {3,0}
-                              };
+using namespace operadores;
 
 GmshHeader::GmshHeader(double ver, int ft, int ds)
 {
@@ -322,6 +310,11 @@ int& Mesh::NumPhyRegions()
     return nphyreg;
 }
 
+int& Mesh::NumberEdges()
+{
+    return nedges;
+}
+
 GmshHeader& Mesh::FileHeader()
 {
     return fileHeader;
@@ -344,12 +337,12 @@ GmshElement* Mesh::Elements()
 
 void Mesh::getEdges()
 {
-    unsigned int nedges = 0;
+    NumberEdges() = 0;
     for(int i=0; i<this->nelements; i++)
     {
         if(this->elements[i].Type() == 2)
         {
-            cout << "Element " << elements[i].ID() << endl;
+            //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<3; j++)
             {
                 int nl1 = Tri3Edge[j][0];
@@ -358,14 +351,22 @@ void Mesh::getEdges()
                 unsigned int ng1 = elements[i].Nodes()[nl1];
                 unsigned int ng2 = elements[i].Nodes()[nl2];
 
-                cout << "   Arestas " << j <<": " << ng1 << " -- " << ng2 << endl;
+                Edge e(ng1,ng2);
+                unsigned long key = CantorKey(e.v1, e.v2);
+                if(EdgeMap.find(key) == EdgeMap.end())
+                {
+                    //
+                    e.id = NumberEdges()++;
+                    EdgeMap[key] = e;
+                }
+                //cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
 
 
             }
         }
         if(this->elements[i].Type() == 3)
         {
-            cout << "Element " << elements[i].ID() << endl;
+            //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<4; j++)
             {
                 int nl1 = Quad4Edge[j][0]; 
@@ -380,21 +381,48 @@ void Mesh::getEdges()
                 if(EdgeMap.find(key) == EdgeMap.end())
                 {
                     //
-                    e.id = nedges++;
+                    e.id =  NumberEdges()++;
                     EdgeMap[key] = e;
                 }
 
 
-                cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
+                //cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
 
 
             }
             
         }
 
+        if(this->elements[i].Type() == 4)
+            {
+                //cout << "Element " << elements[i].ID() << endl;
+                for(int j=0; j<6; j++)
+                {
+                    int nl1 = Tetra6Edge[j][0]; 
+                    int nl2 = Tetra6Edge[j][1];
+                
+
+                    unsigned int ng1 = elements[i].Nodes()[nl1];
+                    unsigned int ng2 = elements[i].Nodes()[nl2];
+                    
+                    Edge e(ng1,ng2);
+                    unsigned long key = CantorKey(e.v1, e.v2);
+                    if(EdgeMap.find(key) == EdgeMap.end())
+                    {
+                        //
+                        e.id = NumberEdges()++;
+                        EdgeMap[key] = e;
+                    }
+
+
+                    //cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
+
+                        
+                }
+            }
+
         
     }
-        cout << "Quantidade de Arestas: "<< nedges<<endl;
        
 }
 

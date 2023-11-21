@@ -10,29 +10,6 @@ using namespace std;
 
 
 
-unsigned long CantorKey(unsigned int x, unsigned int y)
-{
-    if(x>y)
-        return (((x+y+1)*(x+y))/2)+x;
-    else
-        return (((x+y+1)*(x+y))/2)+y;
-}
-    
-unsigned long ElegantKey(unsigned int x, unsigned int y)
-{
-
-    if(x<y)
-    {
-        return (pow(y,2) + x);
-    }
-    else
-    {   
-        return (pow(x,2) + y);
-    }
-
-}
-
-
 
 class Edge
 {
@@ -127,6 +104,10 @@ class Mesh
     Mesh();
     ~Mesh();
 
+    int Tri3Edge[3][2] = {{0,1},{1,2},{2,0}};
+    int Quad4Edge[4][2] = {{0,1},{1,2},{2,3},{3,0}};
+    int Tetra6Edge[6][2] = {{0,1},{0,3},{1,2},{1,3},{2,0},{2,3}};
+
     void OpenFile(string FileName);
     void ExportFile(string FileName);
     void getEdges();
@@ -134,6 +115,7 @@ class Mesh
     int& NumPhyRegions();
     int& NumberNodes();
     int& NumberElements();
+    int& NumberEdges();
 
     GmshHeader& FileHeader();
     GmshPhysicalRegion* PhyReg();
@@ -154,9 +136,5 @@ class Mesh
     int nelements;
     int nphyreg;
     int dimension;
+    int nedges;
 };
-
-
-
-
-

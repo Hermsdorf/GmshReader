@@ -5,20 +5,61 @@
 #include <vector>
 
 #include "iomsh.h"
+#include "operadores.h"
+
+using namespace operadores;
 
 int main()
 {
     string file;
+    cout << "Selecione o arquivo:"<<endl
+         <<"1. malha.msh"<<endl
+         <<"2. 3D Surface Cube.msh"<<endl
+         <<"3. 3D Volume Cube.msh"<<endl
+         <<"4. FullCube.msh"<<endl;
+    int fileID = 1;
+    cin >> fileID;
+    if(fileID == 1)
+        file = "malha.msh";
+    if(fileID == 2)
+        file = "3D Surface Cube.msh";
+    if(fileID == 3)
+        file = "3D Volume Cube.msh";
+    if(fileID == 4)
+        file = "FullCube.msh";
+
     Mesh m;
-    m.OpenFile("malha.msh");
+
+    cout<<endl;
+
+    cout<< "Carregando Malha...."<<endl;
+    m.OpenFile(file);
+    cout<< "Armazenando Arestas...."<<endl;
+    m.getEdges();
+    cout<< "Malha carregada!"<<endl<<endl;
+
 
     cout << "----------File Header ----------:"<<endl;
     cout << "File version: "<< m.FileHeader().Version()<<endl;
     cout << "File Type: "<< m.FileHeader().FileType()<<endl;
     cout << "Data size: "<< m.FileHeader().DataSize()<<endl;
-    cout<< endl<<endl;
+    cout<< endl;
 
-    cout << "----------Physical Regions ----------:"<<endl<<endl;
+    
+    cout << "Physical Regions: " << m.NumPhyRegions()<<endl
+         << "Nodes: " << m.NumberNodes()<<endl
+         << "Elements: " << m.NumberElements()<<endl
+         << "Edges: " << m.NumberEdges()<<endl<<endl;
+
+    cout <<"Informação detalhada ?"<< endl
+         << "1. S" << endl
+         << "2. N" << endl;
+    
+    int report = 2;
+    cin >> report;
+    if(report == 1)
+    {
+        cout << "----------Physical Regions ----------:"<<endl<<endl;
 
     for(int i = 0; i< m.NumPhyRegions(); i++)
     {
@@ -28,9 +69,8 @@ int main()
 
     }
 
-    cout << endl<<endl;
-    
-    cout << "----------Nodes ----------:"<<endl<<endl;
+
+        cout << "----------Nodes ----------:"<<endl<<endl;
 
     for(int i = 0; i< m.NumberNodes(); i++)
     {
@@ -60,31 +100,46 @@ int main()
         {
             cout << m.Elements()[i].Nodes()[k]<<" ";
         }
+        cout << endl;
+        cout <<"Element edges: "<< endl;
+
+        if(m.Elements()[i].Type()== 2)
+        {
+            for(int j = 0; j < 3; j++)
+            {
+                unsigned long key = CantorKey(m.Elements()[i].Nodes()[m.Tri3Edge[j][0]],m.Elements()[i].Nodes()[m.Tri3Edge[j][1]]);
+                cout << "  Edge " << m.EdgeMap[key].id <<": " << m.EdgeMap[key].v1<< " -- " << m.EdgeMap[key].v2 << endl;
+            }
+
+        }
+
+        if(m.Elements()[i].Type()== 3)
+        {
+            for(int j = 0; j < 4; j++)
+            {
+                unsigned long key = CantorKey(m.Elements()[i].Nodes()[m.Quad4Edge[j][0]],m.Elements()[i].Nodes()[m.Quad4Edge[j][1]]);
+                cout << "  Edge " << m.EdgeMap[key].id <<": " << m.EdgeMap[key].v1<< " -- " << m.EdgeMap[key].v2 << endl;
+            }
+
+        }
+
+        if(m.Elements()[i].Type()== 4)
+        {
+            for(int j = 0; j < 6; j++)
+            {
+                unsigned long key = CantorKey(m.Elements()[i].Nodes()[m.Tetra6Edge[j][0]],m.Elements()[i].Nodes()[m.Tetra6Edge[j][1]]);
+                cout << "  Edge " << m.EdgeMap[key].id <<": " << m.EdgeMap[key].v1<< " -- " << m.EdgeMap[key].v2 << endl;
+            }
+
+        }
+
         cout << endl<< endl;
 
     }
 
-    m.getEdges();
-
-    /*
-    
-        int option;
-    cout << "Exportar malha?" << endl
-         << "1 - S" << endl
-         << "2 - N" << endl;
-    
-    cin >> option;
-    if(option == 1)
-    {
-        cout << "Digite o nome do arquivo: ";
-        cin >> file;
-        file = file + ".msh";
-        cout << "Exportando malha....."<<endl;
-        m.ExportFile(file);
-        cout << "Malha exportada em "<< file << endl;
     }
-    */
-
+    
+    
 
 
     return 0;
