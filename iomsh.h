@@ -110,6 +110,7 @@ class Mesh
 
     void OpenFile(string FileName);
     void ExportFile(string FileName);
+    void ExportReportFile(string FileName);
     void getEdges();
 
     int& NumPhyRegions();

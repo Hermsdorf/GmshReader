@@ -295,6 +295,104 @@ void Mesh::ExportFile(string FileName)
     file.close();
 }
 
+void Mesh::ExportReportFile(string FileName)
+{
+    string line;
+    ofstream file; 
+
+    file.open(FileName, ios::out);
+    if(!file.is_open())
+    {
+        cout << "Unable to open file" << endl;
+        //return 0;
+    }   
+
+
+
+    file << "----------File Header ----------:" << '\n';
+    file << "File Version: "<< fileHeader.Version() << '\n'
+         << "File Type: " << fileHeader.FileType() << '\n'
+         << "Data Size: "<< fileHeader.DataSize() << '\n';
+    file <<'\n';
+
+    file << "----------Physical Regions ----------:" << '\n';
+    for(int i = 0; i< nphyreg; i++)
+    {
+        file << "Entity Tag: " << phyReg[i].PhysicalTag() << '\n'
+             << "FDimension: " << phyReg[i].Dimension() <<'\n'
+             << "Data Size: "<< phyReg[i].Name()<< '\n';
+    }
+    file <<'\n';
+
+    file << "----------Nodes----------:" << '\n';
+    for(int i = 0; i< nnodes; i++)
+    {
+        file << "Node ID: " << nodes[i].ID() << '\n'
+             << "X: " << nodes[i].X() << '\n'
+             << "Y: " << nodes[i].Y() <<'\n'
+             << "Z: "<< nodes[i].Z()<< '\n';
+    }
+    file <<'\n';
+
+    file << "----------Elements----------:" << '\n';
+    for(int i = 0; i< nelements; i++)
+    {
+        file << "Element ID: " << elements[i].ID() << '\n'
+             << "Element Type: " << elements[i].Type() << '\n'
+             << "Element Tags: ";
+             for(int j=0; j<elements[i].NumTags();j++)
+             {
+                file << elements[i].Tags()[j] << " ";
+             }file <<'\n';
+
+        file << "Element nodes: ";
+        for(long unsigned int k = 0; k < elements[i].Nodes().size(); k++)
+        {
+            file << elements[i].Nodes()[k]<<" ";
+        }file <<'\n';
+        
+        if(elements[i].Type() >=2)
+        {
+            
+            file << "Element edges: " << '\n';
+         if(elements[i].Type()== 2)
+        {
+            for(int n = 0; n < 3; n++)
+            {
+                unsigned long key = CantorKey(elements[i].Nodes()[Tri3Edge[n][0]],elements[i].Nodes()[Tri3Edge[n][1]]);
+                file << "  Edge " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << '\n';
+            }
+
+        }
+
+        if(elements[i].Type()== 3)
+        {
+            for(int n = 0; n < 4; n++)
+            {
+                unsigned long key = CantorKey(elements[i].Nodes()[Quad4Edge[n][0]],elements[i].Nodes()[Quad4Edge[n][1]]);
+                file << "  Edge " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << '\n';
+            }
+
+        }
+
+        if(elements[i].Type()== 4)
+        {
+            for(int n = 0; n < 6; n++)
+            {
+                unsigned long key = CantorKey(elements[i].Nodes()[Tetra6Edge[n][0]],elements[i].Nodes()[Tetra6Edge[n][1]]);
+                file << "  Edge " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << '\n';
+            }
+
+        }
+        file <<'\n';
+
+        }
+        file <<'\n';
+    }
+    file <<'\n';
+    file.close();
+}
+
 int& Mesh::NumberNodes()
 {
     return nnodes;

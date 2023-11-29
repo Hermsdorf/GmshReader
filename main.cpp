@@ -16,7 +16,9 @@ int main()
          <<"1. malha.msh"<<endl
          <<"2. 3D Surface Cube.msh"<<endl
          <<"3. 3D Volume Cube.msh"<<endl
-         <<"4. FullCube.msh"<<endl;
+         <<"4. FullCube.msh"<<endl
+         <<"5. malhateste1.msh"<<endl
+         <<"6. malhateste2.msh"<<endl;
     int fileID = 1;
     cin >> fileID;
     if(fileID == 1)
@@ -27,6 +29,10 @@ int main()
         file = "3D Volume Cube.msh";
     if(fileID == 4)
         file = "FullCube.msh";
+    if(fileID == 5)
+        file = "malhateste1.msh";
+    if(fileID == 6)
+        file = "malhateste2.msh";
 
     Mesh m;
 
@@ -51,13 +57,26 @@ int main()
          << "Elements: " << m.NumberElements()<<endl
          << "Edges: " << m.NumberEdges()<<endl<<endl;
 
+    int ReportDisplay = 2, ExportReport = 1;
     cout <<"Informação detalhada ?"<< endl
          << "1. S" << endl
          << "2. N" << endl;
-    
-    int report = 2;
-    cin >> report;
-    if(report == 1)
+    cin >> ReportDisplay;
+
+    cout <<"Na tela ou Exportar ?"<< endl
+         << "1. Tela" << endl
+         << "2. Exportar" << endl;
+    cin >> ExportReport;
+
+    if(ReportDisplay == 1 && ExportReport == 2)
+    {
+        string filename;
+        cout << "Digite o nome do arquivo para exportar: ";
+        cin >> filename;
+        m.ExportReportFile(filename);
+    }
+
+    if(ReportDisplay == 1 && ExportReport == 1)
     {
         cout << "----------Physical Regions ----------:"<<endl<<endl;
 
