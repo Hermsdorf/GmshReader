@@ -4,7 +4,7 @@
 #include <sstream>
 #include <vector>
 
-#include "iomsh.h"
+#include "Mesh.h"
 #include "operadores.h"
 
 using namespace operadores;
@@ -22,17 +22,17 @@ int main()
     int fileID = 1;
     cin >> fileID;
     if(fileID == 1)
-        file = "malha.msh";
+        file = "Meshes/malha.msh";
     if(fileID == 2)
-        file = "3D Surface Cube.msh";
+        file = "Meshes/3D Surface Cube.msh";
     if(fileID == 3)
-        file = "3D Volume Cube.msh";
+        file = "Meshes/3D Volume Cube.msh";
     if(fileID == 4)
-        file = "FullCube.msh";
+        file = "Meshes/FullCube.msh";
     if(fileID == 5)
-        file = "malhateste1.msh";
+        file = "Meshes/malhateste1.msh";
     if(fileID == 6)
-        file = "malhateste2.msh";
+        file = "Meshes/malhateste2.msh";
 
     Mesh m;
 
