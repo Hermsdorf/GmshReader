@@ -19,11 +19,14 @@ class Mesh
     int Tri3Edge[3][2] = {{0,1},{1,2},{2,0}};
     int Quad4Edge[4][2] = {{0,1},{1,2},{2,3},{3,0}};
     int Tetra6Edge[6][2] = {{0,1},{0,3},{1,2},{1,3},{2,0},{2,3}};
+    int RefineTriangle [4][3] = {{0,3,5}, {3,4,5},{3,1,4}, {5,4,2}};
 
     void OpenFile(string FileName);
     void ExportFile(string FileName);
     void ExportReportFile(string FileName);
     void getEdges();
+    void refine();
+    void NewElement();
 
     int& NumPhyRegions();
     int& NumberNodes();

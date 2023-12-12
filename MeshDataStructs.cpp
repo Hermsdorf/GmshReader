@@ -4,6 +4,7 @@ Edge::Edge(unsigned int vert1, unsigned int vert2)
 {
     v1 = vert1;
     v2 = vert2;
+    newnode.divided=false;
 }
 
 Edge::Edge() {}

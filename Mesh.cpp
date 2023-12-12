@@ -399,3 +399,77 @@ void Mesh::getEdges()
     }
        
 }
+
+void Mesh::NewElement()
+{
+
+}
+
+void Mesh::refine()
+{
+    GmshElement *newelms = new GmshElement [0];
+    
+    vector <GmshNode> newvertex[nnodes];
+    for(int i=0; i<nnodes; i++)
+    {
+        newvertex[i].ID() = Nodes()[i].ID();
+        newvertex[i].X() = Nodes()[i].X();
+        newvertex[i].Y() = Nodes()[i].Y();
+        newvertex[i].Z() = Nodes()[i].Z();
+    }
+
+    for(int i=0; i< this -> nelements; i++)
+    {
+        if(this-> elements[i].Type() == 2)
+        {
+            unsigned long NewVertex[6];
+            for (int j = 0; j < 3; j++)
+            {
+                unsigned int ng1 = elements[i].Nodes()[Tri3Edge[j][0]];
+                unsigned int ng2 = elements[i].Nodes()[Tri3Edge[j][1]];
+                unsigned long key = CantorKey(ng1, ng2);
+                NewVertex[j] = ng1;
+
+                if (EdgeMap[key].newnode.divided == false)
+                {
+                    midpoint(nodes[ng1], nodes[ng2], EdgeMap[key].newnode.node);
+                    EdgeMap[key].newnode.divided = true;
+                    EdgeMap[key].newnode.node.ID() = nnodes+1
+                    nodes.resize(nnodes + 1);
+                    nodes.push_back(EdgeMap[key].newnode.node);
+                    NewVertex[3 + j] = nnodes;
+                    nnodes++;
+                }
+                else
+                {
+                    NewVertex[3 + j] = EdgeMap[key].newnode.node.ID();
+                }
+                
+
+                
+            }
+
+            for(int k=0; k<4; k++)
+            {
+                GmshElement *e = new GmshElement;
+                e->ID() = nelements;
+                e->Type() = elements[i].Type();
+                e->NumTags() = elements[i].NumTags();
+                e->Tags().resize(e->NumTags());
+                for(int n = 0; n < e->NumTags(), n++)
+                {
+                    e->Tags()[n]=elements[i].Tags()[n];
+                }
+                e->Nodes().resize(ElementType[e->Type()]);
+                for(int m =0; m<ElementType[e->Type()]; m++)
+                {
+                    e->Nodes()[m]=RefineTriangle [k][m];
+                }
+                elements.push_back(e);
+                nelements++;
+                delete e;
+            }
+
+        }
+    }
+}

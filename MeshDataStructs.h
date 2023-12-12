@@ -5,16 +5,6 @@
 
 using namespace std;
 
-class Edge
-{
-public:
-    Edge(unsigned int vert1, unsigned int vert2);
-    Edge();
-    ~Edge();
-    unsigned int id;
-    unsigned int v1, v2;
-};
-
 class GmshHeader
 {
 public:
@@ -85,4 +75,22 @@ private:
     int numTags;
     vector<int> tags;
     vector<int> nodes;
+};
+
+class Edge
+{
+public:
+    Edge(unsigned int vert1, unsigned int vert2);
+    Edge();
+    ~Edge();
+    unsigned int id;
+    unsigned int v1, v2;
+    
+    struct
+    {
+        bool divided;
+        GmshNode node;
+    }newnode;
+    
+    
 };
