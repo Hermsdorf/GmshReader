@@ -14,7 +14,7 @@ namespace operadores
 
     unsigned long CantorKey(unsigned int x, unsigned int y);
     unsigned long ElegantKey(unsigned int x, unsigned int y);
-    void midpoint(GmshNode p1, GmshNode p2, GmshNode &p3);
+    GmshNode midpoint(GmshNode p1, GmshNode p2);
     
 
 }

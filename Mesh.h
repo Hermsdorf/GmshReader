@@ -1,3 +1,7 @@
+
+#ifndef MESH_H__
+#define MESH_H__
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -34,17 +38,17 @@ class Mesh
     int& NumberEdges();
 
     GmshHeader& FileHeader();
-    GmshPhysicalRegion* PhyReg();
-    GmshNode* Nodes();
-    GmshElement* Elements();
+    std::vector<GmshPhysicalRegion>& PhyReg();
+    std::vector<GmshNode>&  Nodes();
+    std::vector<GmshElement>&  Elements();
     std::unordered_map<unsigned long int , Edge > EdgeMap;
 
     private:
     
     GmshHeader fileHeader;
-    GmshPhysicalRegion *phyReg ; 
-    GmshNode *nodes;
-    GmshElement *elements;
+    std::vector<GmshPhysicalRegion> phyReg ; 
+    std::vector<GmshNode>           nodes;
+    std::vector<GmshElement>        elements;
 
     
     int ElementType[11] = {0,2,3,4,4,8,6,5,3,6,9};
@@ -55,3 +59,4 @@ class Mesh
     int nedges;
 };
 
+#endif

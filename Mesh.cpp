@@ -34,7 +34,8 @@ void Mesh::OpenFile(string FileName)
 
     getline(file,line); //$PhysicalNames
     file >> NumPhyRegions(); getline(file,line); 
-    phyReg = new GmshPhysicalRegion [NumPhyRegions()];
+    //phyReg = new GmshPhysicalRegion [NumPhyRegions()];
+    phyReg.resize(NumPhyRegions());
 
     for(int i = 0; i < NumPhyRegions(); i++)
     {
@@ -50,7 +51,8 @@ void Mesh::OpenFile(string FileName)
 
     getline(file,line); // $Nodes
     file >> NumberNodes(); getline(file,line); 
-    nodes = new GmshNode[NumberNodes()];
+    //nodes = new GmshNode[NumberNodes()];
+    nodes.resize(NumberNodes());
 
     for(int i=0; i< NumberNodes(); i++)
     {
@@ -66,7 +68,8 @@ void Mesh::OpenFile(string FileName)
 
     getline(file,line); // $Elements;
     file >> NumberElements(); getline(file,line);
-    elements = new GmshElement[NumberElements()];
+    //elements = new GmshElement[NumberElements()];
+    elements.resize(NumberElements());
 
     for(int i=0; i<NumberElements(); i++)
     {
@@ -294,17 +297,17 @@ GmshHeader& Mesh::FileHeader()
     return fileHeader;
 }
 
-GmshPhysicalRegion* Mesh::PhyReg()
+std::vector<GmshPhysicalRegion>& Mesh::PhyReg()
 {
     return phyReg;
 }
 
-GmshNode* Mesh::Nodes()
+std::vector<GmshNode>& Mesh::Nodes()
 {
     return nodes;
 }
 
-GmshElement* Mesh::Elements()
+std::vector<GmshElement>& Mesh::Elements()
 {
     return elements;
 }
@@ -407,9 +410,12 @@ void Mesh::NewElement()
 
 void Mesh::refine()
 {
-    GmshElement *newelms = new GmshElement [0];
-    
-    vector <GmshNode> newvertex[nnodes];
+
+    std::vector<GmshElement> newelms;
+    newelms.reserve(4*nelements);
+
+    /*
+    vector <GmshNode> newvertex(nnodes);
     for(int i=0; i<nnodes; i++)
     {
         newvertex[i].ID() = Nodes()[i].ID();
@@ -417,10 +423,11 @@ void Mesh::refine()
         newvertex[i].Y() = Nodes()[i].Y();
         newvertex[i].Z() = Nodes()[i].Z();
     }
+    */
 
     for(int i=0; i< this -> nelements; i++)
     {
-        if(this-> elements[i].Type() == 2)
+        if(this-> elements[i].Type() == 2) // Triangulo
         {
             unsigned long NewVertex[6];
             for (int j = 0; j < 3; j++)
@@ -428,21 +435,21 @@ void Mesh::refine()
                 unsigned int ng1 = elements[i].Nodes()[Tri3Edge[j][0]];
                 unsigned int ng2 = elements[i].Nodes()[Tri3Edge[j][1]];
                 unsigned long key = CantorKey(ng1, ng2);
-                NewVertex[j] = ng1;
+                //NewVertex[j] = ng1;
 
-                if (EdgeMap[key].newnode.divided == false)
+                if (EdgeMap[key].divided == false)
                 {
-                    midpoint(nodes[ng1], nodes[ng2], EdgeMap[key].newnode.node);
-                    EdgeMap[key].newnode.divided = true;
-                    EdgeMap[key].newnode.node.ID() = nnodes+1
-                    nodes.resize(nnodes + 1);
-                    nodes.push_back(EdgeMap[key].newnode.node);
+                    GmshNode node = midpoint(nodes[ng1], nodes[ng2]);
+                    EdgeMap[key].divided = true;
+                    EdgeMap[key].id      = nnodes+1;
+                    //nodes.resize(nnodes + 1);
+                    nodes.push_back(node);
                     NewVertex[3 + j] = nnodes;
                     nnodes++;
                 }
                 else
                 {
-                    NewVertex[3 + j] = EdgeMap[key].newnode.node.ID();
+                    NewVertex[3 + j] = EdgeMap[key].id;
                 }
                 
 
@@ -451,23 +458,22 @@ void Mesh::refine()
 
             for(int k=0; k<4; k++)
             {
-                GmshElement *e = new GmshElement;
-                e->ID() = nelements;
-                e->Type() = elements[i].Type();
-                e->NumTags() = elements[i].NumTags();
-                e->Tags().resize(e->NumTags());
-                for(int n = 0; n < e->NumTags(), n++)
+                GmshElement e;
+                e.ID() = newelms.size();
+                e.Type() = elements[i].Type();
+                e.NumTags() = elements[i].NumTags();
+                e.Tags().resize(e.NumTags());
+                for(int n = 0; n < e.NumTags(), n++)
                 {
-                    e->Tags()[n]=elements[i].Tags()[n];
+                    e.Tags()[n]=elements[i].Tags()[n];
                 }
-                e->Nodes().resize(ElementType[e->Type()]);
-                for(int m =0; m<ElementType[e->Type()]; m++)
+                e.Nodes().resize(ElementType[e.Type()]);
+                for(int m =0; m<ElementType[e.Type()]; m++)
                 {
-                    e->Nodes()[m]=RefineTriangle [k][m];
+                    unsigned int idx = RefineTriangle[k][m];
+                    e.Nodes()[m]= NewVertex[idx];
                 }
-                elements.push_back(e);
-                nelements++;
-                delete e;
+                newelms.push_back(e);
             }
 
         }
