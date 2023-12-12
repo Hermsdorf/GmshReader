@@ -1,3 +1,7 @@
+
+#ifndef MESTDATASTRUCTS_H__
+#define MESTDATASTRUCTS_H__
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -49,6 +53,7 @@ public:
     double &X();
     double &Y();
     double &Z();
+    //GmshNode operator=(const GmshNode &other);
 
 private:
     int id;
@@ -85,12 +90,15 @@ public:
     ~Edge();
     unsigned int id;
     unsigned int v1, v2;
+    bool divided;
     
-    struct
-    {
-        bool divided;
-        GmshNode node;
-    }newnode;
+    //struct
+    //{
+    //    bool divided;
+    //    GmshNode node;
+    //}newnode;
     
     
 };
+
+#endif
