@@ -34,7 +34,7 @@ unsigned long operadores::ElegantKey(unsigned int x, unsigned int y)
 
 GmshNode  operadores::midpoint(GmshNode p1, GmshNode p2)
 {
-    GmshNode p3
+    GmshNode p3;
     p3.X() = (( p1.X() + p2.X() )/2);
     p3.Y() = (( p1.Y() + p2.Y() )/2); 
     p3.Y() = (( p1.Z() + p2.Z() )/2); 

@@ -63,10 +63,13 @@ int main()
          << "2. N" << endl;
     cin >> ReportDisplay;
 
-    cout <<"Na tela ou Exportar ?"<< endl
-         << "1. Tela" << endl
-         << "2. Exportar" << endl;
-    cin >> ExportReport;
+    if (ReportDisplay == 1)
+    {
+        cout << "Na tela ou Exportar ?" << endl
+             << "1. Tela" << endl
+             << "2. Exportar" << endl;
+        cin >> ExportReport;
+    }
 
     if(ReportDisplay == 1 && ExportReport == 2)
     {

@@ -1,3 +1,6 @@
+#ifndef OPERADORES_H__
+#define OPERADORES_H__
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -18,3 +21,4 @@ namespace operadores
     
 
 }
+#endif
