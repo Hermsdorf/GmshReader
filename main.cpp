@@ -18,7 +18,9 @@ int main()
          <<"3. 3D Volume Cube.msh"<<endl
          <<"4. FullCube.msh"<<endl
          <<"5. malhateste1.msh"<<endl
-         <<"6. malhateste2.msh"<<endl;
+         <<"6. malhateste2.msh"<<endl
+         <<"7. triangle.msh"<<endl;
+         
     int fileID = 1;
     cin >> fileID;
     if(fileID == 1)
@@ -33,6 +35,8 @@ int main()
         file = "Meshes/malhateste1.msh";
     if(fileID == 6)
         file = "Meshes/malhateste2.msh";
+    if(fileID == 7)
+        file = "Meshes/triangle.msh";
 
     Mesh m;
 
@@ -160,9 +164,24 @@ int main()
     }
 
     }
-    
-    
 
-
+    bool refineMesh = 0;
+    cout << "Refinar malha?";
+    cin >> refineMesh;
+    if(refineMesh == 1)
+    {
+        cout<< "Digite o nome da nova malha: ";
+        cin >> file;
+        file = file + ".msh";
+        cout << "Refinando malha...."<<endl;
+        m.refine();
+        cout << "Amarzenando arestas...."<<endl;
+        m.getEdges();
+        cout << "Exportando arquivo.msh...."<<endl;
+        m.ExportFile(file);
+        cout << "Malha "<<file<<" exportada comsucesso!!"<<endl<<endl;
+        
+    }
+    cout << "Programa encerrado.";
     return 0;
 }

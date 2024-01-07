@@ -315,9 +315,9 @@ std::vector<GmshElement>& Mesh::Elements()
 void Mesh::getEdges()
 {
     NumberEdges() = 0;
-    for(int i=0; i<this->nelements; i++)
+    for(int i=0; i< nelements; i++)
     {
-        if(this->elements[i].Type() == 2)
+        if(elements[i].Type() == 2)
         {
             //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<3; j++)
@@ -341,7 +341,7 @@ void Mesh::getEdges()
 
             }
         }
-        if(this->elements[i].Type() == 3)
+        if(elements[i].Type() == 3)
         {
             //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<4; j++)
@@ -370,7 +370,7 @@ void Mesh::getEdges()
             
         }
 
-        if(this->elements[i].Type() == 4)
+        if(elements[i].Type() == 4)
             {
                 //cout << "Element " << elements[i].ID() << endl;
                 for(int j=0; j<6; j++)
@@ -414,13 +414,13 @@ void Mesh::refine()
     std::vector<GmshElement> NewElements;
     NewElements.reserve(4*nelements);
 
-    for(int i=0; i< this -> nelements; i++)
+    for(int i=0; i<nelements; i++)
     {
         if(this-> elements[i].Type() == 2) // Triangulo
         {
             unsigned long NewVertex[6];
             for (int j = 0; j < 3; j++)
-            {
+            {                                               //  i  j
                 unsigned int ng1 = elements[i].Nodes()[Tri3Edge[j][0]];
                 unsigned int ng2 = elements[i].Nodes()[Tri3Edge[j][1]];
                 unsigned long key = CantorKey(ng1, ng2);
@@ -428,12 +428,13 @@ void Mesh::refine()
 
                 if (EdgeMap[key].divided == false)
                 {
-                    GmshNode node = midpoint(nodes[ng1], nodes[ng2]);
+                    nnodes ++;
+                    GmshNode node = EgdeMidpoint(nodes[(ng1-1)], nodes[(ng2-1)]);
                     EdgeMap[key].divided = true;
-                    EdgeMap[key].id      = nnodes+1;
+                    EdgeMap[key].id      = nnodes;
+                    node.ID()            = nnodes;
                     nodes.push_back(node);
                     NewVertex[3 + j] = nnodes;
-                    nnodes++;
                 }
                 else
                 {
@@ -444,7 +445,7 @@ void Mesh::refine()
             for(int k=0; k<4; k++)
             {
                 GmshElement e;
-                e.ID() = NewElements.size();
+                e.ID() = NewElements.size()+1;
                 e.Type() = elements[i].Type();
                 e.NumTags() = elements[i].NumTags();
                 e.Tags().resize(e.NumTags());
@@ -462,5 +463,69 @@ void Mesh::refine()
             }
 
         }
+
+        if(this-> elements[i].Type() == 3) // Quadrado
+        {
+             unsigned long NewVertex[9];
+             int points [4];
+             for (int j = 0; j < 4; j++)
+            {
+                unsigned int ng1 = elements[i].Nodes()[Quad4Edge[j][0]];
+                unsigned int ng2 = elements[i].Nodes()[Quad4Edge[j][1]];
+                unsigned long key = CantorKey(ng1, ng2);
+                NewVertex[j] = ng1;
+                points[j] = ng1-1;
+
+                if (EdgeMap[key].divided == false)
+                {
+                    nnodes++;
+                    GmshNode node = EgdeMidpoint(nodes[ng1-1], nodes[ng2-1]);
+                    EdgeMap[key].divided = true;
+                    EdgeMap[key].id      = nnodes;
+                    node.ID()            = nnodes;
+                    nodes.push_back(node);
+                    NewVertex[4 + j] = nnodes;
+                }
+                else
+                {
+                    NewVertex[4 + j] = EdgeMap[key].id;
+                }                
+            }
+
+            // Criado o ponto central do quadrilátero e adicionando o novo nó ao vetor de nós da malha
+            nnodes++;
+            GmshNode node = SquareMidpoint(nodes[points[0]],nodes[points[1]],nodes[points[2]],nodes[points[3]]);
+            node .ID() = nnodes;
+            nodes.push_back(node);
+            NewVertex[8] = nnodes;
+
+            for(int k=0; k<4; k++)
+            {
+                GmshElement e;
+                e.ID() = NewElements.size();
+                e.Type() = elements[i].Type();
+                e.NumTags() = elements[i].NumTags();
+                e.Tags().resize(e.NumTags());
+                for(int n = 0; n < e.NumTags(); n++)
+                {
+                    e.Tags()[n]=elements[i].Tags()[n];
+                }
+                e.Nodes().resize(ElementType[e.Type()]);
+                for(int m =0; m<ElementType[e.Type()]; m++)
+                {
+                    unsigned int idx = RefineSquare[k][m];
+                    e.Nodes()[m]= NewVertex[idx];
+                }
+                NewElements.push_back(e);
+            }
+            
+        }
+
     }
+    //cout << NewElements.size()<<endl;
+    //cout << elements.size()<<endl;
+    nelements = NewElements.size();
+    elements.resize(NewElements.size());
+    elements = NewElements;
+    //cout << elements.size()<<endl;
 }
