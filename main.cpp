@@ -166,7 +166,7 @@ int main()
     }
 
     bool refineMesh = 0;
-    cout << "Refinar malha?";
+    cout << "Refinar malha? "<<endl<< "0 - Não  ; 1 - Sim"<<endl;
     cin >> refineMesh;
     if(refineMesh == 1)
     {
@@ -182,6 +182,6 @@ int main()
         cout << "Malha "<<file<<" exportada comsucesso!!"<<endl<<endl;
         
     }
-    cout << "Programa encerrado.";
+    cout << "Programa encerrado."<<endl;
     return 0;
 }
