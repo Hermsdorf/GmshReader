@@ -416,6 +416,48 @@ void Mesh::refine()
 
     for(int i=0; i<nelements; i++)
     {
+        if(this-> elements[i].Type()==1) // Aresta de superfície
+        {
+            unsigned int ng1 = elements[i].Nodes()[0];
+            unsigned int ng2 = elements[i].Nodes()[1];
+            unsigned long key = CantorKey(ng1, ng2);
+            unsigned long NewVertex[3];
+            NewVertex[0] = ng1;
+            NewVertex[2] = ng2;
+            if(EdgeMap[key].divided == false)
+            {
+                nnodes++;
+                GmshNode node = EgdeMidpoint(nodes[(ng1-1)], nodes[(ng2-1)]);
+                EdgeMap[key].divided = true;
+                EdgeMap[key].id      = nnodes;
+                node.ID()            = nnodes;
+                nodes.push_back(node);
+                NewVertex[1] = nnodes;
+            }
+            else
+            {
+                NewVertex[1] = EdgeMap[key].id;
+            }
+            for (int k = 0; k < 2; k++)
+            {
+                GmshElement e;
+                e.ID() = NewElements.size()+1;
+                e.Type() = elements[i].Type();
+                e.NumTags() = elements[i].NumTags();
+                e.Tags().resize(e.NumTags());
+                for(int n = 0; n < e.NumTags(); n++)
+                {
+                    e.Tags()[n]=elements[i].Tags()[n];
+                }
+                e.Nodes().resize(ElementType[e.Type()]);
+                e.Nodes()[0]= NewVertex[k];
+                e.Nodes()[1]= NewVertex[k+1];
+                NewElements.push_back(e);
+            }
+            
+
+        }
+
         if(this-> elements[i].Type() == 2) // Triangulo
         {
             unsigned long NewVertex[6];
@@ -522,10 +564,9 @@ void Mesh::refine()
         }
 
     }
-    //cout << NewElements.size()<<endl;
-    //cout << elements.size()<<endl;
+    
+    
     nelements = NewElements.size();
     elements.resize(NewElements.size());
     elements = NewElements;
-    //cout << elements.size()<<endl;
 }
