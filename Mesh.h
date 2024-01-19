@@ -25,8 +25,11 @@ class Mesh
                           {2,0}}; //i = 2
     int Quad4Edge[4][2] = {{0,1},{1,2},{2,3},{3,0}};
     int Tetra6Edge[6][2] = {{0,1},{0,3},{1,2},{1,3},{2,0},{2,3}};
+    
     int RefineTriangle [4][3] = {{0,3,5}, {3,4,5},{3,1,4}, {5,4,2}};
     int RefineSquare [4][4] = {{0,4,8,7}, {4,1,5,8},{8,5,2,6},{7,8,6,3}};
+    int RefineTetrahedron [8][4] = {{0,4,6,7}, {4,1,5,9}, {6,5,2,8}, {7,9,8,3}, 
+                                    {4,6,7,9}, {4,9,5,6}, {6,7,9,8}, {6,8,9,5}};
 
     void OpenFile(string FileName);
     void ExportFile(string FileName);

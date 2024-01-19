@@ -416,6 +416,7 @@ void Mesh::refine()
 
     for(int i=0; i<nelements; i++)
     {
+
         if(this-> elements[i].Type()==1) // Aresta de superfície
         {
             unsigned int ng1 = elements[i].Nodes()[0];
@@ -563,9 +564,60 @@ void Mesh::refine()
             
         }
 
+        if(this-> elements[i].Type() == 4) // Tetraedro
+        {
+            unsigned long NewVertex[10];
+            for (int j = 0; j < 4; j++)
+            {
+                NewVertex[j]= elements[i].Nodes()[j];
+            }
+
+            for(int k = 0; k < 6; k++)
+            {
+                unsigned int ng1 =  elements[i].Nodes()[Tetra6Edge[k][0]];
+                unsigned int ng2 =  elements[i].Nodes()[Tetra6Edge[k][1]];
+                unsigned long key = CantorKey(ng1, ng2);
+                if (EdgeMap[key].divided == false)
+                {
+                    nnodes ++;
+                    GmshNode node = EgdeMidpoint(nodes[(ng1-1)], nodes[(ng2-1)]);
+                    EdgeMap[key].divided = true;
+                    EdgeMap[key].id      = nnodes;
+                    node.ID()            = nnodes;
+                    nodes.push_back(node);
+                    NewVertex[4 + k] = nnodes;
+                }
+                else
+                {
+                    NewVertex[4 + k] = EdgeMap[key].id;
+                }    
+            }
+
+            for(int m = 0; m < 8; m++)
+            {
+                GmshElement e;
+                e.ID() = NewElements.size()+1;
+                e.Type() = elements[i].Type();
+                e.NumTags() = elements[i].NumTags();
+                e.Tags().resize(e.NumTags());
+                for(int n = 0; n < e.NumTags(); n++)
+                {
+                    e.Tags()[n]=elements[i].Tags()[n];
+                }
+                e.Nodes().resize(ElementType[e.Type()]);
+                for (int n = 0; n < 4; n++)
+                {
+                    unsigned int idx = RefineTetrahedron[m][n];
+                    e.Nodes()[n]= NewVertex[idx];
+                }
+                NewElements.push_back(e);
+            }
+            
+        }
+
     }
-    
-    
+    // Substituição do vetor de elementos iniciais pelo vetor 
+    // de elementos da malha refinada.
     nelements = NewElements.size();
     elements.resize(NewElements.size());
     elements = NewElements;

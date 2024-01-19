@@ -61,7 +61,8 @@ int main()
          << "Elements: " << m.NumberElements()<<endl
          << "Edges: " << m.NumberEdges()<<endl<<endl;
 
-    int ReportDisplay = 2, ExportReport = 1;
+    int ReportDisplay = 2;
+    int ExportReport = 1;
     cout <<"Informação detalhada ?"<< endl
          << "1. S" << endl
          << "2. N" << endl;
