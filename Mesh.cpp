@@ -1,6 +1,5 @@
 #include "Mesh.h"
 
-
 Mesh::Mesh(){}
 Mesh::~Mesh(){}
 
@@ -34,7 +33,6 @@ void Mesh::OpenFile(string FileName)
 
     getline(file,line); //$PhysicalNames
     file >> NumPhyRegions(); getline(file,line); 
-    //phyReg = new GmshPhysicalRegion [NumPhyRegions()];
     phyReg.resize(NumPhyRegions());
 
     for(int i = 0; i < NumPhyRegions(); i++)
@@ -68,7 +66,6 @@ void Mesh::OpenFile(string FileName)
 
     getline(file,line); // $Elements;
     file >> NumberElements(); getline(file,line);
-    //elements = new GmshElement[NumberElements()];
     elements.resize(NumberElements());
 
     for(int i=0; i<NumberElements(); i++)
@@ -89,8 +86,6 @@ void Mesh::OpenFile(string FileName)
         }
         getline(file,line);
     }
-
-    
 
     file.close();
 
@@ -174,10 +169,108 @@ void Mesh::ExportFile(string FileName)
     file.close();
 }
 
-void Mesh::ExportReportFile(string FileName)
+void Mesh::Report()
 {
+        cout << "----------Physical Regions ----------:" << endl;
+    for(int i = 0; i< nphyreg; i++)
+    {
+        cout << "Entity Tag: " << phyReg[i].PhysicalTag() << endl
+             << "Dimension: "  << phyReg[i].Dimension()   << endl
+             << "Name: "       << phyReg[i].Name()        << endl
+             << endl;
+    }
+    cout <<endl;
+
+    cout << "----------Nodes----------:" << endl;
+    for(int i = 0; i< nnodes; i++)
+    {
+        cout << "Node ID: " << nodes[i].ID() << endl
+             << "X: "       << nodes[i].X()  << " "
+             << "Y: "       << nodes[i].Y()  << " "
+             << "Z: "       << nodes[i].Z()  << endl
+             << endl;
+    }
+    cout << endl;
+
+    cout << "----------Elements----------:" << endl;
+    for (int i = 0; i < nelements; i++)
+    {
+        cout << "Element ID: "   << elements[i].ID()   << endl
+             << "Element Type: " << elements[i].Type() << endl
+             << "Element Tags: ";
+        for (int j = 0; j < elements[i].NumTags(); j++)
+        {
+            cout << elements[i].Tags()[j] << " ";
+        }
+        cout << endl;
+
+        cout << "Element nodes: ";
+        for (long unsigned int k = 0; k < elements[i].Nodes().size(); k++)
+        {
+            cout << elements[i].Nodes()[k] << " ";
+        }
+        cout << endl;
+
+        cout << "Element edges: " << endl;
+        if (elements[i].Type() == 2)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                int ng1 = elements[i].Nodes()[Tri3Edge[j][0]];
+                int ng2 = elements[i].Nodes()[Tri3Edge[j][1]];
+                Edge e(ng1,ng2);
+                unsigned long key = EdgeKey(e.v1, e.v2);                
+                
+                cout << "  Edge " << EdgeMap[key].id 
+                     << ": "      << EdgeMap[key].v1
+                     << " -- "    << EdgeMap[key].v2 
+                     << endl;
+            }
+        }
+
+        if (elements[i].Type() == 3)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                int ng1 = elements[i].Nodes()[Quad4Edge[j][0]];
+                int ng2 = elements[i].Nodes()[Quad4Edge[j][1]];
+                Edge e(ng1,ng2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
+                cout << "  Edge " << EdgeMap[key].id
+                     << ": "      << EdgeMap[key].v1 
+                     << " -- "    << EdgeMap[key].v2
+                     << endl;
+            }
+        }
+
+        if (elements[i].Type() == 4)
+        {
+            for (int j = 0; j < 6; j++)
+            {
+                int ng1 = elements[i].Nodes()[Tetra6Edge[j][0]];
+                int ng2 = elements[i].Nodes()[Tetra6Edge[j][1]];
+                Edge e(ng1,ng2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
+                cout << "  Edge " << EdgeMap[key].id 
+                     << ": "      << EdgeMap[key].v1 
+                     << " -- "    << EdgeMap[key].v2 
+                     << endl;
+            }
+        }
+        cout << endl;
+    }
+}
+
+void Mesh::ExportReportFile()
+
+{
+    string FileName;
     string line;
     ofstream file; 
+
+    cout << "Digite o nome do arquivo para exportar: ";
+    cin >> FileName;
+    FileName = FileName + ".txt";
 
     file.open(FileName, ios::out);
     if(!file.is_open())
@@ -188,18 +281,18 @@ void Mesh::ExportReportFile(string FileName)
 
 
 
-    file << "----------File Header ----------:" << '\n';
-    file << "File Version: "<< fileHeader.Version() << '\n'
-         << "File Type: " << fileHeader.FileType() << '\n'
-         << "Data Size: "<< fileHeader.DataSize() << '\n';
+    file << "----------File Header ----------:"      << '\n';
+    file << "File Version: "<< fileHeader.Version()  << '\n'
+         << "File Type: "   << fileHeader.FileType() << '\n'
+         << "Data Size: "   << fileHeader.DataSize() << '\n';
     file <<'\n';
 
     file << "----------Physical Regions ----------:" << '\n';
     for(int i = 0; i< nphyreg; i++)
     {
         file << "Entity Tag: " << phyReg[i].PhysicalTag() << '\n'
-             << "Dimension: " << phyReg[i].Dimension() <<'\n'
-             << "Name: "<< phyReg[i].Name()<< '\n';
+             << "Dimension: "  << phyReg[i].Dimension()   << '\n'
+             << "Name: "       << phyReg[i].Name()        << '\n';
     }
     file <<'\n';
 
@@ -207,16 +300,16 @@ void Mesh::ExportReportFile(string FileName)
     for(int i = 0; i< nnodes; i++)
     {
         file << "Node ID: " << nodes[i].ID() << '\n'
-             << "X: " << nodes[i].X() << '\n'
-             << "Y: " << nodes[i].Y() <<'\n'
-             << "Z: "<< nodes[i].Z()<< '\n';
+             << "X: "       << nodes[i].X()  << '\n'
+             << "Y: "       << nodes[i].Y()  << '\n'
+             << "Z: "       << nodes[i].Z()  << '\n';
     }
     file <<'\n';
 
     file << "----------Elements----------:" << '\n';
     for(int i = 0; i< nelements; i++)
     {
-        file << "Element ID: " << elements[i].ID() << '\n'
+        file << "Element ID: "   << elements[i].ID()   << '\n'
              << "Element Type: " << elements[i].Type() << '\n'
              << "Element Tags: ";
              for(int j=0; j<elements[i].NumTags();j++)
@@ -236,30 +329,48 @@ void Mesh::ExportReportFile(string FileName)
             file << "Element edges: " << '\n';
          if(elements[i].Type()== 2)
         {
-            for(int n = 0; n < 3; n++)
+            for(int j = 0; j < 3; j++)
             {
-                unsigned long key = CantorKey(elements[i].Nodes()[Tri3Edge[n][0]],elements[i].Nodes()[Tri3Edge[n][1]]);
-                file << "  Edge " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << '\n';
+                int ng1 = elements[i].Nodes()[Tri3Edge[j][0]];
+                int ng2 = elements[i].Nodes()[Tri3Edge[j][1]];
+                Edge e(ng1,ng2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
+                file << "  Edge " << EdgeMap[key].id 
+                     <<": "       << EdgeMap[key].v1
+                     << " -- "    << EdgeMap[key].v2
+                     << '\n';
             }
 
         }
 
         if(elements[i].Type()== 3)
         {
-            for(int n = 0; n < 4; n++)
+            for(int j = 0; j < 4; j++)
             {
-                unsigned long key = CantorKey(elements[i].Nodes()[Quad4Edge[n][0]],elements[i].Nodes()[Quad4Edge[n][1]]);
-                file << "  Edge " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << '\n';
+                int ng1 = elements[i].Nodes()[Quad4Edge[j][0]];
+                int ng2 = elements[i].Nodes()[Quad4Edge[j][1]];
+                Edge e(ng1,ng2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
+                file << "  Edge " << EdgeMap[key].id 
+                     <<": "       << EdgeMap[key].v1
+                     << " -- "    << EdgeMap[key].v2 
+                     << '\n';
             }
 
         }
 
         if(elements[i].Type()== 4)
         {
-            for(int n = 0; n < 6; n++)
+            for(int j = 0; j < 6; j++)
             {
-                unsigned long key = CantorKey(elements[i].Nodes()[Tetra6Edge[n][0]],elements[i].Nodes()[Tetra6Edge[n][1]]);
-                file << "  Edge " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << '\n';
+                int ng1 = elements[i].Nodes()[Tetra6Edge[j][0]];
+                int ng2 = elements[i].Nodes()[Tetra6Edge[j][1]];
+                Edge e(ng1,ng2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
+                file << "  Edge " << EdgeMap[key].id
+                     <<": "       << EdgeMap[key].v1
+                     << " -- "    << EdgeMap[key].v2  
+                     << '\n';
             }
 
         }
@@ -317,7 +428,7 @@ void Mesh::getEdges()
     NumberEdges() = 0;
     for(int i=0; i< nelements; i++)
     {
-        if(elements[i].Type() == 2)
+        if(elements[i].Type() == TRIANGLE) // triangulo
         {
             //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<3; j++)
@@ -329,10 +440,9 @@ void Mesh::getEdges()
                 unsigned int ng2 = elements[i].Nodes()[nl2];
 
                 Edge e(ng1,ng2);
-                unsigned long key = CantorKey(e.v1, e.v2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
                 if(EdgeMap.find(key) == EdgeMap.end())
                 {
-                    //
                     e.id = NumberEdges()++;
                     EdgeMap[key] = e;
                 }
@@ -341,7 +451,8 @@ void Mesh::getEdges()
 
             }
         }
-        if(elements[i].Type() == 3)
+
+        if(elements[i].Type() == QUADRANGLE) // quadrado
         {
             //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<4; j++)
@@ -354,7 +465,7 @@ void Mesh::getEdges()
                 unsigned int ng2 = elements[i].Nodes()[nl2];
                 
                 Edge e(ng1,ng2);
-                unsigned long key = CantorKey(e.v1, e.v2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
                 if(EdgeMap.find(key) == EdgeMap.end())
                 {
                     //
@@ -370,7 +481,7 @@ void Mesh::getEdges()
             
         }
 
-        if(elements[i].Type() == 4)
+        if(elements[i].Type() == TETRAHEDRON)
             {
                 //cout << "Element " << elements[i].ID() << endl;
                 for(int j=0; j<6; j++)
@@ -383,7 +494,7 @@ void Mesh::getEdges()
                     unsigned int ng2 = elements[i].Nodes()[nl2];
                     
                     Edge e(ng1,ng2);
-                    unsigned long key = CantorKey(e.v1, e.v2);
+                    unsigned long key = EdgeKey(e.v1, e.v2);
                     if(EdgeMap.find(key) == EdgeMap.end())
                     {
                         //
@@ -397,15 +508,8 @@ void Mesh::getEdges()
                         
                 }
             }
-
-        
     }
        
-}
-
-void Mesh::NewElement()
-{
-
 }
 
 void Mesh::refine()
@@ -417,11 +521,11 @@ void Mesh::refine()
     for(int i=0; i<nelements; i++)
     {
 
-        if(this-> elements[i].Type()==1) // Aresta de superfície
+        if(this-> elements[i].Type()== LINE) // Aresta de superfície
         {
             unsigned int ng1 = elements[i].Nodes()[0];
             unsigned int ng2 = elements[i].Nodes()[1];
-            unsigned long key = CantorKey(ng1, ng2);
+            unsigned long key = EdgeKey(ng1, ng2);
             unsigned long NewVertex[3];
             NewVertex[0] = ng1;
             NewVertex[2] = ng2;
@@ -459,14 +563,14 @@ void Mesh::refine()
 
         }
 
-        if(this-> elements[i].Type() == 2) // Triangulo
+        if(this-> elements[i].Type() == TRIANGLE) // Triangulo
         {
             unsigned long NewVertex[6];
             for (int j = 0; j < 3; j++)
             {                                               //  i  j
                 unsigned int ng1 = elements[i].Nodes()[Tri3Edge[j][0]];
                 unsigned int ng2 = elements[i].Nodes()[Tri3Edge[j][1]];
-                unsigned long key = CantorKey(ng1, ng2);
+                unsigned long key = EdgeKey(ng1, ng2);
                 NewVertex[j] = ng1;
 
                 if (EdgeMap[key].divided == false)
@@ -507,7 +611,7 @@ void Mesh::refine()
 
         }
 
-        if(this-> elements[i].Type() == 3) // Quadrado
+        if(this-> elements[i].Type() == QUADRANGLE) // Quadrado
         {
              unsigned long NewVertex[9];
              int points [4];
@@ -515,7 +619,7 @@ void Mesh::refine()
             {
                 unsigned int ng1 = elements[i].Nodes()[Quad4Edge[j][0]];
                 unsigned int ng2 = elements[i].Nodes()[Quad4Edge[j][1]];
-                unsigned long key = CantorKey(ng1, ng2);
+                unsigned long key = EdgeKey(ng1, ng2);
                 NewVertex[j] = ng1;
                 points[j] = ng1-1;
 
@@ -535,12 +639,26 @@ void Mesh::refine()
                 }                
             }
 
-            // Criado o ponto central do quadrilátero e adicionando o novo nó ao vetor de nós da malha
+            // Criado o ponto central do quadrilátero e adicionando o novo nó ao vetor de nós da malha e
+            // armazenando este nó na hash cpQuadrangle.
             nnodes++;
             GmshNode node = SquareMidpoint(nodes[points[0]],nodes[points[1]],nodes[points[2]],nodes[points[3]]);
             node .ID() = nnodes;
             nodes.push_back(node);
             NewVertex[8] = nnodes;
+            int ng1 = elements[i].Nodes()[0];
+            int ng2 = elements[i].Nodes()[1];
+            int ng3 = elements[i].Nodes()[2];
+            int ng4 = elements[i].Nodes()[3];
+            unsigned long key = QuadKey(ng1, ng2, ng3, ng4);
+            if(cpQuadrangle.find(key) == cpQuadrangle.end())
+            {
+                cpQuadrangle[key] = node;
+            }
+            else
+            {
+                cout << "Erro ao inserir ponto central do quadrilátero na hash" << endl;
+            }
 
             for(int k=0; k<4; k++)
             {
@@ -564,7 +682,7 @@ void Mesh::refine()
             
         }
 
-        if(this-> elements[i].Type() == 4) // Tetraedro
+        if(this-> elements[i].Type() ==  TETRAHEDRON) // Tetraedro
         {
             unsigned long NewVertex[10];
             for (int j = 0; j < 4; j++)
@@ -576,7 +694,7 @@ void Mesh::refine()
             {
                 unsigned int ng1 =  elements[i].Nodes()[Tetra6Edge[k][0]];
                 unsigned int ng2 =  elements[i].Nodes()[Tetra6Edge[k][1]];
-                unsigned long key = CantorKey(ng1, ng2);
+                unsigned long key = EdgeKey(ng1, ng2);
                 if (EdgeMap[key].divided == false)
                 {
                     nnodes ++;
