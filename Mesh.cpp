@@ -48,8 +48,7 @@ void Mesh::OpenFile(string FileName)
     /*---------------Nodes---------------*/
 
     getline(file,line); // $Nodes
-    file >> NumberNodes(); getline(file,line); 
-    //nodes = new GmshNode[NumberNodes()];
+    file >> NumberNodes(); getline(file,line);
     nodes.resize(NumberNodes());
 
     for(int i=0; i< NumberNodes(); i++)
@@ -428,9 +427,8 @@ void Mesh::getEdges()
     NumberEdges() = 0;
     for(int i=0; i< nelements; i++)
     {
-        if(elements[i].Type() == TRIANGLE) // triangulo
+        if(elements[i].Type() == TRIANGLE)
         {
-            //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<3; j++)
             {
                 int nl1 = Tri3Edge[j][0];
@@ -446,15 +444,11 @@ void Mesh::getEdges()
                     e.id = NumberEdges()++;
                     EdgeMap[key] = e;
                 }
-                //cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
-
-
             }
         }
 
-        if(elements[i].Type() == QUADRANGLE) // quadrado
+        if(elements[i].Type() == QUADRANGLE)
         {
-            //cout << "Element " << elements[i].ID() << endl;
             for(int j=0; j<4; j++)
             {
                 int nl1 = Quad4Edge[j][0]; 
@@ -472,18 +466,12 @@ void Mesh::getEdges()
                     e.id =  NumberEdges()++;
                     EdgeMap[key] = e;
                 }
-
-
-                //cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
-
-
             }
             
         }
 
         if(elements[i].Type() == TETRAHEDRON)
             {
-                //cout << "Element " << elements[i].ID() << endl;
                 for(int j=0; j<6; j++)
                 {
                     int nl1 = Tetra6Edge[j][0]; 
@@ -500,14 +488,30 @@ void Mesh::getEdges()
                         //
                         e.id = NumberEdges()++;
                         EdgeMap[key] = e;
-                    }
-
-
-                    //cout << "   Aresta " << EdgeMap[key].id <<": " << EdgeMap[key].v1<< " -- " << EdgeMap[key].v2 << endl;
-
-                        
+                    }                        
                 }
             }
+        
+        if(elements[i].Type() == HEXAHEDRON)
+        {
+            for(int j=0; j<12; j++)
+            {
+                int nl1 = Hexa8Edge[j][0]; 
+                int nl2 = Hexa8Edge[j][1];
+                
+                unsigned int ng1 = elements[i].Nodes()[nl1];
+                unsigned int ng2 = elements[i].Nodes()[nl2];
+                
+                Edge e(ng1,ng2);
+                unsigned long key = EdgeKey(e.v1, e.v2);
+                if(EdgeMap.find(key) == EdgeMap.end())
+                {
+                    e.id =  NumberEdges()++;
+                    EdgeMap[key] = e;
+                }
+            }
+        }
+
     }
        
 }
@@ -521,7 +525,7 @@ void Mesh::refine()
     for(int i=0; i<nelements; i++)
     {
 
-        if(this-> elements[i].Type()== LINE) // Aresta de superfície
+        if(this-> elements[i].Type() == LINE)        // Aresta de superfície
         {
             unsigned int ng1 = elements[i].Nodes()[0];
             unsigned int ng2 = elements[i].Nodes()[1];
@@ -563,7 +567,7 @@ void Mesh::refine()
 
         }
 
-        if(this-> elements[i].Type() == TRIANGLE) // Triangulo
+        if(this-> elements[i].Type() == TRIANGLE)    // Trianguloc de superfície
         {
             unsigned long NewVertex[6];
             for (int j = 0; j < 3; j++)
@@ -611,17 +615,15 @@ void Mesh::refine()
 
         }
 
-        if(this-> elements[i].Type() == QUADRANGLE) // Quadrado
+        if(this-> elements[i].Type() == QUADRANGLE)  // Quadrado de superfície
         {
              unsigned long NewVertex[9];
-             int points [4];
              for (int j = 0; j < 4; j++)
             {
-                unsigned int ng1 = elements[i].Nodes()[Quad4Edge[j][0]];
-                unsigned int ng2 = elements[i].Nodes()[Quad4Edge[j][1]];
+                unsigned long ng1 = elements[i].Nodes()[Quad4Edge[j][0]];
+                unsigned long ng2 = elements[i].Nodes()[Quad4Edge[j][1]];
                 unsigned long key = EdgeKey(ng1, ng2);
                 NewVertex[j] = ng1;
-                points[j] = ng1-1;
 
                 if (EdgeMap[key].divided == false)
                 {
@@ -641,23 +643,23 @@ void Mesh::refine()
 
             // Criado o ponto central do quadrilátero e adicionando o novo nó ao vetor de nós da malha e
             // armazenando este nó na hash cpQuadrangle.
-            nnodes++;
-            GmshNode node = SquareMidpoint(nodes[points[0]],nodes[points[1]],nodes[points[2]],nodes[points[3]]);
-            node .ID() = nnodes;
-            nodes.push_back(node);
-            NewVertex[8] = nnodes;
-            int ng1 = elements[i].Nodes()[0];
-            int ng2 = elements[i].Nodes()[1];
-            int ng3 = elements[i].Nodes()[2];
-            int ng4 = elements[i].Nodes()[3];
+            unsigned long ng1 = elements[i].Nodes()[0];
+            unsigned long ng2 = elements[i].Nodes()[1];
+            unsigned long ng3 = elements[i].Nodes()[2];
+            unsigned long ng4 = elements[i].Nodes()[3];
             unsigned long key = QuadKey(ng1, ng2, ng3, ng4);
             if(cpQuadrangle.find(key) == cpQuadrangle.end())
             {
+                nnodes++;
+                GmshNode node = SquareMidpoint(nodes[ng1-1], nodes[ng2-1], nodes[ng3-1], nodes[ng4-1]);
+                node .ID() = nnodes;
+                nodes.push_back(node);
+                NewVertex[8] = nnodes;
                 cpQuadrangle[key] = node;
             }
             else
             {
-                cout << "Erro ao inserir ponto central do quadrilátero na hash" << endl;
+                NewVertex[8] = cpQuadrangle[key].ID();
             }
 
             for(int k=0; k<4; k++)
@@ -682,7 +684,7 @@ void Mesh::refine()
             
         }
 
-        if(this-> elements[i].Type() ==  TETRAHEDRON) // Tetraedro
+        if(this-> elements[i].Type() == TETRAHEDRON) // Tetraedro
         {
             unsigned long NewVertex[10];
             for (int j = 0; j < 4; j++)
@@ -732,6 +734,100 @@ void Mesh::refine()
             }
             
         }
+
+        if(this-> elements[i].Type() == HEXAHEDRON)  // Hexaedro
+        {
+            unsigned long NewVertex[27]; // Vetor para armazenar todos os pontos necessários para criar os 8 novos elementos;
+
+            
+            for (int j = 0; j < 8; j++) // Rotina apra armazenar os pontos que definem o hexadro a ser refinado;
+            {
+                NewVertex[j] = elements[i].Nodes()[j];
+            }
+
+            for (int k = 0; k < 12; k++) // Rotina para criar  os pontos médios das arestas que formam o hexaedro;
+            {
+                unsigned long ng1 = elements[i].Nodes()[Hexa8Edge[k][0]];
+                unsigned long ng2 = elements[i].Nodes()[Hexa8Edge[k][1]];
+                unsigned long key = EdgeKey(ng1, ng2);
+
+                if (EdgeMap[key].divided == false)
+                {
+                    nnodes++;
+                    GmshNode node = EgdeMidpoint(nodes[(ng1 - 1)], nodes[(ng2 - 1)]);
+                    EdgeMap[key].divided = true;
+                    EdgeMap[key].id = nnodes;
+                    node.ID() = nnodes;
+                    nodes.push_back(node);
+                    NewVertex[8 + k] = nnodes;
+                }
+                else
+                {
+                    NewVertex[8 + k] = EdgeMap[key].id;
+                }
+            }
+            
+            for(int k = 0; k < 6; k++) // Rotina para criar os nós centrais das faces do hexaedro;
+            {
+                unsigned long ng1 = elements[i].Nodes()[HexaedroFacesNodes[k][0]];
+                unsigned long ng2 = elements[i].Nodes()[HexaedroFacesNodes[k][1]];
+                unsigned long ng3 = elements[i].Nodes()[HexaedroFacesNodes[k][2]];
+                unsigned long ng4 = elements[i].Nodes()[HexaedroFacesNodes[k][3]];
+                unsigned long key = QuadKey(ng1, ng2, ng3, ng4);
+                if (cpQuadrangle.find(key) == cpQuadrangle.end())
+                {
+                    nnodes++;
+                    GmshNode node = SquareMidpoint(nodes[ng1 - 1], nodes[ng2 - 1], nodes[ng3 - 1], nodes[ng4 - 1]);
+                    node.ID() = nnodes;
+                    nodes.push_back(node);
+                    cpQuadrangle[key] = node;
+                    NewVertex[20 + k] = nnodes;
+                }
+                else
+                {
+                    NewVertex[20 + k] = cpQuadrangle[key].ID();
+                }
+            }
+
+            //Crinado o ponto central do hexaedro;
+             unsigned long key = HexaKey(NewVertex[0], NewVertex[1], NewVertex[2], NewVertex[3],
+                                         NewVertex[4], NewVertex[5], NewVertex[6], NewVertex[7]);
+            if(cpHexahedron.find(key) == cpHexahedron.end())
+            {
+                nnodes++;
+                GmshNode node = HexaMidpoint(nodes[NewVertex[0] - 1], nodes[NewVertex[1] - 1], nodes[NewVertex[2] - 1], nodes[NewVertex[3] - 1],
+                                             nodes[NewVertex[4] - 1], nodes[NewVertex[5] - 1], nodes[NewVertex[6] - 1], nodes[NewVertex[7] - 1]);
+                node.ID() = nnodes;
+                nodes.push_back(node);
+                cpHexahedron[key] = node;
+                NewVertex[26] = nnodes;
+            }
+            else
+            {
+                NewVertex[26] = cpHexahedron[key].ID();
+            }
+
+            for(int m = 0; m < 8; m++) // Rotina para criar os 8 novos elementos;
+            {
+                GmshElement e;
+                e.ID() = NewElements.size() + 1;
+                e.Type() = elements[i].Type();
+                e.NumTags() = elements[i].NumTags();
+                e.Tags().resize(e.NumTags());
+                for (int n = 0; n < e.NumTags(); n++)
+                {
+                    e.Tags()[n] = elements[i].Tags()[n];
+                }
+                e.Nodes().resize(ElementType[e.Type()]);
+                for (int n = 0; n < 8; n++)
+                {
+                    unsigned int idx = RefineHexahedron[m][n];
+                    e.Nodes()[n] = NewVertex[idx];
+                }
+                NewElements.push_back(e);
+            }
+        }
+
 
     }
     // Substituição do vetor de elementos iniciais pelo vetor 

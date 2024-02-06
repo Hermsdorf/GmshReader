@@ -2,17 +2,9 @@
 
 Edge::Edge(unsigned int vert1, unsigned int vert2)
 {
-    if(vert1<vert2)
-    {
-        v1 = vert1;
-        v2 = vert2;
-    }
-    else
-    {
-        v1 = vert2;
-        v2 = vert1;
-    }
-    divided=false;
+    v1 = vert1;
+    v2 = vert2;
+    divided = false;
 }
 
 Edge::Edge() {}

@@ -20,10 +20,44 @@ int main()
          << "5. malhateste1.msh" << endl
          << "6. malhateste2.msh" << endl
          << "7. triangle.msh" << endl
-         << "8. testeref.msh" << endl;
+         << "8. testeref.msh" << endl
+         << "9. HexaedroSimples.msh" << endl;
 
     int fileID = 1;
     cin >> fileID;
+
+    switch (fileID)
+    {
+    case 1:
+        file = "Meshes/malha.msh";
+        break;
+    case 2:
+        file = "Meshes/3D Surface Cube.msh";
+        break;
+    case 3:
+        file = "Meshes/3D Volume Cube.msh";
+        break;
+    case 4:
+        file = "Meshes/FullCube.msh";
+        break;
+    case 5:
+        file = "Meshes/malhateste1.msh";
+        break;
+    case 6:
+        file = "Meshes/malhateste2.msh";
+        break;
+    case 7:
+        file = "Meshes/triangle.msh";
+        break;
+    case 8:
+        file = "Meshes/testeref.msh";
+        break;
+    case 9:
+        file = "Meshes/HexaedroSimples.msh";
+        break;
+    }
+
+    /*
     if (fileID == 1)
         file = "Meshes/malha.msh";
     if (fileID == 2)
@@ -40,6 +74,9 @@ int main()
         file = "Meshes/triangle.msh";
     if (fileID == 8)
         file = "Meshes/testeref.msh";
+    if (fileID == 9)
+        file = "Meshes/HexaedroSimples.msh";
+    */
 
     Mesh m;
 
@@ -70,7 +107,6 @@ int main()
          << "1. S" << endl
          << "0. N" << endl;
     cin >> Report;
-
     if (Report == 1)
     {
         cout << "Na tela ou Exportar ?" << endl
@@ -82,11 +118,10 @@ int main()
         {
             m.ExportReportFile();
         }
-    }
-
-    if (Report == 1 && ExportReport == 0)
-    {
-        m.Report();
+        else
+        {
+            m.Report();
+        }
     }
 
     bool refineMesh = 0;
@@ -98,7 +133,7 @@ int main()
         int bfr = m.NumberElements();
         cout << "Digite o nome da nova malha: ";
         cin >> file;
-        file = file + ".msh";
+        file = "Meshes/Refined Meshes/" + file + ".msh";
         cout << "Refinando malha...." << endl;
         m.refine();
         cout << "Refinando " << bfr << " elementos em " << m.NumberElements() << " elementos." << endl;
