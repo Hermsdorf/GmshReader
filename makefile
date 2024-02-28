@@ -6,7 +6,7 @@ OBJ=$(CPP_SOURCE:.cpp=.o)
 
 CXX=g++
 
-CXX_FLAGS=-Wall
+CXX_FLAGS=-Wall -g -pg
 
 TARGET=main.exe
 
@@ -20,3 +20,7 @@ $(TARGET): $(OBJ) $(H_SOURCE)
 
 clean:
 	rm -rf *.o
+
+ gprof: $(TARGET) 
+	./$(TARGET)
+	gprof $(TARGET) gmon.out > analysis.txt

@@ -91,8 +91,6 @@ public:
     unsigned int id;
     unsigned int v1, v2;
     bool divided;
-       
-    
 };
 
 #endif

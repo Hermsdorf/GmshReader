@@ -651,7 +651,7 @@ void Mesh::refine()
             if(cpQuadrangle.find(key) == cpQuadrangle.end())
             {
                 nnodes++;
-                GmshNode node = SquareMidpoint(nodes[ng1-1], nodes[ng2-1], nodes[ng3-1], nodes[ng4-1]);
+                GmshNode node = QuadMidpoint(nodes[ng1-1], nodes[ng2-1], nodes[ng3-1], nodes[ng4-1]);
                 node .ID() = nnodes;
                 nodes.push_back(node);
                 NewVertex[8] = nnodes;
@@ -777,7 +777,7 @@ void Mesh::refine()
                 if (cpQuadrangle.find(key) == cpQuadrangle.end())
                 {
                     nnodes++;
-                    GmshNode node = SquareMidpoint(nodes[ng1 - 1], nodes[ng2 - 1], nodes[ng3 - 1], nodes[ng4 - 1]);
+                    GmshNode node = QuadMidpoint(nodes[ng1 - 1], nodes[ng2 - 1], nodes[ng3 - 1], nodes[ng4 - 1]);
                     node.ID() = nnodes;
                     nodes.push_back(node);
                     cpQuadrangle[key] = node;

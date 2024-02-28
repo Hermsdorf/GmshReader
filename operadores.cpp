@@ -34,42 +34,6 @@ using namespace operadores;
   c ^= b; c -= rot(b,24); \
 }
 
-
-void operadores::merge (unsigned long vet[], int esq, int meio, int dir )
-{
-  int i = esq, j = meio + 1, k = 0;
-  unsigned long aux[dir - esq + 1];
-  while (i <= meio && j <= dir)
-    if (vet[i] < vet[j])
-      aux[k++] = vet[i++];
-    else
-      aux[k++] = vet[j++];
-  while (i <= meio)
-    aux[k++] = vet[i++];
-  while (j <= dir)
-    aux[k++] = vet[j++];
-  for (i = esq; i <= dir; i++)
-    vet[i] = aux[i - esq];
-}
-
-void operadores::auxMergeSort(unsigned long vet[], int esq, int dir)
-{
-  if (esq < dir)
-  {
-    int meio = (esq + dir) / 2;
-    auxMergeSort(vet, esq, meio);
-    auxMergeSort(vet, meio + 1, dir);
-    merge(vet, esq, meio, dir);
-  }
-}
-
-void operadores::mergeSort(unsigned long vet[], int n)
-{
-  auxMergeSort(vet, 0, n - 1);
-}
-
-
-
 unsigned long operadores::EdgeKey(unsigned long a, unsigned long b)
 {
     if (a<b)
@@ -85,33 +49,21 @@ unsigned long operadores::EdgeKey(unsigned long a, unsigned long b)
 unsigned long operadores::TriKey(unsigned long a, unsigned long b, unsigned long c)
 {
     unsigned long vet[3] = {a,b,c};
-    mergeSort(vet,3);
+    sort(vet,vet+3);
     mix(vet[0],vet[1],vet[2]);
     final(vet[0],vet[1],vet[2]);
     return vet[2];
-    /*
-    mix(a,b,c);
-    final(a,b,c);
-    return c;
-    */
 }
 
 unsigned long operadores::QuadKey(unsigned long a, unsigned long b, 
                                   unsigned long c, unsigned long d)
 {
     unsigned long vet[4] = {a,b,c,d};
-    
-    mergeSort(vet,4);
+    sort(vet,vet+4);
     mix(vet[0],vet[1],vet[2]);
     vet[0]+=vet[3];
     final(vet[0],vet[1],vet[2]);
     return vet[2];
-    /*
-    mix(a,b,c);
-    a+=d;
-    final(a,b,c);
-    return c;
-    */
 }
 
 unsigned long operadores::HexaKey(unsigned long a, unsigned long b,
@@ -120,23 +72,14 @@ unsigned long operadores::HexaKey(unsigned long a, unsigned long b,
                                   unsigned long g, unsigned long h)
 {
     unsigned long vet[8] = {a,b,c,d,e,f,g,h};
-    
-    mergeSort(vet,8);
+
+    std::sort(vet,vet+8);
     mix(vet[0],vet[1],vet[2]);
     vet[0]+=vet[3]; vet[1]+=vet[4]; vet[2]+=vet[5];
     mix(vet[0],vet[1],vet[2]);
     vet[0]+=vet[6]; vet[1]+=vet[7];
     final(vet[0],vet[1],vet[2]);
     return vet[2];
-
-    /*
-    mix(a,b,c);
-    a+=d; b+=e; c+=f;
-    mix(a,b,c);
-    a+=g; b+=h;
-    final(a,b,c);
-    return c;
-    */
 }
 
 unsigned long operadores::CantorKey(unsigned int x, unsigned int y)
@@ -170,7 +113,7 @@ GmshNode operadores::EgdeMidpoint(GmshNode p1, GmshNode p2)
     return p3;
 }
 
-GmshNode operadores::SquareMidpoint(GmshNode p1, GmshNode p2, GmshNode p3, GmshNode p4 )
+GmshNode operadores::QuadMidpoint(GmshNode p1, GmshNode p2, GmshNode p3, GmshNode p4 )
 {
     GmshNode cp;
     cp.X() = ( ( p1.X() + p2.X() + p3.X() + p4.X()) / 4 );
