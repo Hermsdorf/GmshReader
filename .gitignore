@@ -1,3 +1,6 @@
 *.exe
 *.o
+*.dot
+*.txt
+*.out
 .vscode
